@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { m, AnimatePresence, type Transition } from "framer-motion";
 import type { Project } from "@/content/types";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -113,6 +114,15 @@ export function ProjectExpansion({
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
+  // The expansion is portaled to <body> so it escapes the page's transition
+  // wrapper. That wrapper carries a transform/filter, which would otherwise make
+  // this position:fixed dialog resolve against the wrapper instead of the
+  // viewport — mis-sizing it and breaking its scroll.
+  const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setPortalHost(document.body);
+  }, []);
+
   // Lock background scroll, wire Escape, and manage focus while open (§17).
   useEffect(() => {
     if (!project) return;
@@ -139,7 +149,9 @@ export function ProjectExpansion({
     ? { duration: 0.15 }
     : springLayout;
 
-  return (
+  if (!portalHost) return null;
+
+  return createPortal(
     <AnimatePresence>
       {project && (
         <m.div
@@ -320,6 +332,7 @@ export function ProjectExpansion({
           </m.article>
         </m.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    portalHost,
   );
 }
