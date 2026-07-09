@@ -37,16 +37,8 @@ export function PageIntro({
           }}
         >
           <span style={{ color: "var(--accent)", fontWeight: 600 }}>{index}</span>
-          <span
-            aria-hidden
-            style={{
-              width: 28,
-              height: 1,
-              background: dark ? "var(--dark-border)" : "var(--border-strong)",
-              display: "inline-block",
-            }}
-          />
-          <span style={{ textTransform: "uppercase" }}>Coen · coen.life</span>
+          <span aria-hidden style={{ color: tertiary }}>·</span>
+          <span style={{ textTransform: "uppercase" }}>coen.life</span>
         </p>
       </Reveal>
       <Reveal delay={0.06}>

@@ -9,7 +9,7 @@ import type { Project } from "./types";
 export const projects: Project[] = [
   {
     id: "project-one",
-    title: "Improve digital safety for everyone",
+    title: "Improve digital safety for all",
     year: "2025 – present",
     role: "Public Policy",
     summary:
