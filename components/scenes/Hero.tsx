@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useTransform } from "framer-motion";
+import { m, useTransform } from "framer-motion";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -56,7 +56,7 @@ export function Hero({ statement }: { statement: string }) {
         Coen — {statement}
       </h1>
 
-      <motion.div
+      <m.div
         style={{
           opacity,
           y,
@@ -89,7 +89,7 @@ export function Hero({ statement }: { statement: string }) {
             ↓
           </span>
         </GlassButton>
-      </motion.div>
+      </m.div>
     </section>
   );
 }

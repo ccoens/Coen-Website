@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { m, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useCapability } from "@/lib/capability";
 
 /*
@@ -96,7 +96,7 @@ export function Cursor() {
   const isLens = state === "image";
 
   return (
-    <motion.div
+    <m.div
       aria-hidden
       style={{
         position: "fixed",
@@ -118,7 +118,7 @@ export function Cursor() {
         mixBlendMode: "normal",
       }}
     >
-      <motion.div
+      <m.div
         animate={{
           scale: scale,
           scaleY: pressY,
@@ -142,6 +142,6 @@ export function Cursor() {
             : "0 0 14px hsl(var(--accent-h) 45% 60% / 0.4)",
         }}
       />
-    </motion.div>
+    </m.div>
   );
 }

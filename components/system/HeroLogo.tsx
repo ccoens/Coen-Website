@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  motion,
+  m,
   useMotionValue,
   useMotionValueEvent,
   useSpring,
@@ -151,7 +151,7 @@ export function HeroLogo() {
   };
 
   return (
-    <motion.div
+    <m.div
       style={{
         position: "fixed",
         top: 0,
@@ -205,7 +205,7 @@ export function HeroLogo() {
           />
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -237,10 +237,10 @@ function HeroLetter({
   const sy = useSpring(ly, { stiffness: 140, damping: 18, mass: 0.6 });
 
   return (
-    <motion.span
+    <m.span
       style={{ display: "inline-block", x: sx, y: sy, willChange: "transform" }}
     >
       {char}
-    </motion.span>
+    </m.span>
   );
 }

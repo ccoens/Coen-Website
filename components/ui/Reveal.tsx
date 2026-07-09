@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import type { CSSProperties, ElementType, ReactNode } from "react";
+import { m } from "framer-motion";
+import type { CSSProperties, ReactNode } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import {
   revealVariants,
@@ -19,9 +19,14 @@ import {
  * together cascades by its delays.
  */
 
+// `as` is limited to intrinsic tags: strict LazyMotion forbids the motion()
+// factory, so we index the `m` namespace by tag name. All scene usages pass a
+// plain tag ("div", "p", "article").
+type MotionTagName = keyof typeof m & keyof React.JSX.IntrinsicElements;
+
 type RevealProps = {
   children: ReactNode;
-  as?: ElementType;
+  as?: MotionTagName;
   className?: string;
   style?: CSSProperties;
   /** Stagger delay in seconds. */
@@ -36,7 +41,7 @@ export function Reveal({
   delay = 0,
 }: RevealProps) {
   const reduced = useReducedMotion();
-  const MotionTag = motion(as as ElementType);
+  const MotionTag = m[as] as React.ElementType;
   const variants = reduced ? revealVariantsReduced : revealVariants;
 
   return (

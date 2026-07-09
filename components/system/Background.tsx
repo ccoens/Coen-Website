@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useMotionValue, animate, useMotionValueEvent } from "framer-motion";
+import { m, useMotionValue, animate, useMotionValueEvent } from "framer-motion";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 
@@ -109,7 +109,7 @@ export function Background() {
       {/* Bloom: a soft light that reads the current light-field position, so a
           fast scroll briefly lifts the field near where the eye already is. */}
       {!reduced && (
-        <motion.div
+        <m.div
           style={{
             position: "absolute",
             inset: 0,

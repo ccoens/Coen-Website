@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { LazyMotion, domMax } from "framer-motion";
 import {
   CapabilityContext,
   useMeasuredCapability,
@@ -40,14 +41,23 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <CapabilityContext.Provider value={cap}>
-      <SmoothScroll>
-        <Background />
-        <LightField />
-        <HeroLogo />
-        <Nav />
-        <main id="main">{children}</main>
-        <Cursor />
-      </SmoothScroll>
+      {/*
+        LazyMotion + `m` ship a single feature bundle once instead of baking all
+        of `motion`'s features into every import. `domMax` retains layout
+        animation (the shared-element project expansion needs layoutId). `strict`
+        forbids the heavier `motion` component so nothing silently reinflates the
+        bundle.
+      */}
+      <LazyMotion features={domMax} strict>
+        <SmoothScroll>
+          <Background />
+          <LightField />
+          <HeroLogo />
+          <Nav />
+          <main id="main">{children}</main>
+          <Cursor />
+        </SmoothScroll>
+      </LazyMotion>
     </CapabilityContext.Provider>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, useMotionValueEvent, useTransform } from "framer-motion";
+import { m, useMotionValueEvent, useTransform } from "framer-motion";
 import { Glass } from "@/components/ui/Glass";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -44,7 +44,7 @@ export function Nav() {
   );
 
   return (
-    <motion.nav
+    <m.nav
       aria-label="Primary"
       initial={false}
       animate={{
@@ -60,7 +60,7 @@ export function Nav() {
         zIndex: "var(--z-nav)" as unknown as number,
       }}
     >
-      <motion.div style={{ opacity: velOpacity }}>
+      <m.div style={{ opacity: velOpacity }}>
         <Glass as="div" variant="nav" radius="lg" blur={20}>
           <ul
             style={{
@@ -83,8 +83,8 @@ export function Nav() {
             ))}
           </ul>
         </Glass>
-      </motion.div>
-    </motion.nav>
+      </m.div>
+    </m.nav>
   );
 }
 
@@ -122,7 +122,7 @@ function NavLink({
     >
       {label}
       {/* Centre-out light-sweep underline (§12, §14). */}
-      <motion.span
+      <m.span
         aria-hidden
         initial={false}
         animate={{ scaleX: hover ? 1 : 0, opacity: hover ? 1 : 0 }}

@@ -121,6 +121,28 @@ body[data-custom-cursor="true"] button {
   margin-inline: auto;
 }
 
+/* Locks background scroll while an immersive project expansion is open. Lenis
+   drives window scroll, so removing overflow stops the wheel from doing work. */
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+}
+
+/* Scene-specific responsive grids. Mobile-first single column; split at ≥900px. */
+@media (min-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1.15fr 0.85fr !important;
+    align-items: start;
+  }
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr auto !important;
+    align-items: end;
+  }
+}
+
 /* Accessible skip link — visible only when focused (§17). */
 .skip-link {
   position: fixed;
@@ -173,6 +195,20 @@ body[data-custom-cursor="true"] button {
   border-radius: 50%;
   filter: blur(60px);
   will-change: transform;
+}
+
+/* Live-status dot: a slow, calm breath. Frozen under reduced motion. */
+@keyframes livePulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: livePulse 3.2s var(--ease-ambient) infinite;
 }
 
 /* When the OS asks for less motion, we let CSS transitions collapse to instant

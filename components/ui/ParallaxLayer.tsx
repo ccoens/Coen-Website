@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { m, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { springSoftOptions } from "@/lib/motion";
@@ -51,12 +51,12 @@ export function ParallaxLayer({
   }
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       style={{ ...style, y, willChange: "transform" }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

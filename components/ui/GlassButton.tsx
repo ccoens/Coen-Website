@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import type { ReactNode } from "react";
 import { useCapability } from "@/lib/capability";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -75,7 +75,7 @@ export function GlassButton(props: GlassButtonProps) {
     <>
       {/* Centre-out light sweep on hover; accent-tinted, subtle (§14). */}
       {!reduced && (
-        <motion.span
+        <m.span
           aria-hidden
           initial={{ opacity: 0, scaleX: 0.2 }}
           whileHover={{ opacity: 1, scaleX: 1 }}
@@ -98,14 +98,14 @@ export function GlassButton(props: GlassButtonProps) {
 
   if ("href" in props && props.href) {
     return (
-      <motion.a href={props.href} className={className} style={surface} {...motionProps}>
+      <m.a href={props.href} className={className} style={surface} {...motionProps}>
         {inner}
-      </motion.a>
+      </m.a>
     );
   }
 
   return (
-    <motion.button
+    <m.button
       type={props.type ?? "button"}
       onClick={props.onClick}
       className={className}
@@ -113,6 +113,6 @@ export function GlassButton(props: GlassButtonProps) {
       {...motionProps}
     >
       {inner}
-    </motion.button>
+    </m.button>
   );
 }
