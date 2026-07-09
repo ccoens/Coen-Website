@@ -42,7 +42,7 @@ export function About({
               className="type-h3"
               style={{ marginBottom: "var(--space-4)", maxWidth: "20ch" }}
             >
-              <Reveal>A person thinking and building in public.</Reveal>
+              <Reveal>All About Coen.</Reveal>
             </h3>
             <div className="type-body" style={{ color: "var(--text-secondary)" }}>
               {lines.map((line, i) => (

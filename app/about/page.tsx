@@ -6,13 +6,14 @@ import { profile } from "@/content/profile";
 
 export const metadata: Metadata = {
   title: "About — Coen",
-  description: "A person thinking and building in public.",
+  description:
+    "I'm someone who wants to create a better experience for all, through safety and software.",
 };
 
 export default function AboutPage() {
   return (
     <>
-      <PageIntro index="01" title="About" lead="A person thinking and building in public." />
+      <PageIntro index="01" title="About" lead="I'm someone who wants to create a better experience for all, through safety and software." />
       <About profile={profile} hideHeader />
       <Current profile={profile} />
     </>

@@ -16,7 +16,6 @@ export function Current({ profile }: { profile: Profile }) {
     <section id="current" className="scene" aria-labelledby="current-title">
       <div className="scene-inner">
         <SceneHeader
-          index="05"
           title="Current"
           id="current-title"
           lead="Where my attention is, right now."

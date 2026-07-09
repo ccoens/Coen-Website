@@ -13,16 +13,19 @@ export const profile: Profile = {
     "Building ideas that improve how people experience technology.",
 
   about:
-    "FILL: about — a short first-person paragraph on who Coen is and how he works. " +
-    "Two or three sentences, plain-spoken and specific. It should read like a person " +
-    "thinking in public, not a résumé. Replace this text in content/profile.ts.",
+    "I'm Coen, a student and creator who has lived in four countries and loves " +
+    "exploring new places, cultures, and perspectives. I'm driven by curiosity — " +
+    "whether that means building technology, learning from different communities, " +
+    "or meeting new people along the way. I believe the best ideas come from " +
+    "understanding the world around us and creating things that can make a " +
+    "positive impact for everyone.",
 
   current: [
-    { label: "Reading", value: "FILL: current book or essay" },
-    { label: "Building", value: "FILL: the thing being made right now" },
-    { label: "Learning", value: "FILL: a skill or subject in progress" },
-    { label: "Listening", value: "FILL: an album, artist or podcast" },
-    { label: "Travelling", value: "FILL: where, or “home for now”" },
+    { label: "Reading", value: "The Giver by Lois Lowry" },
+    { label: "Building", value: "Swift Student Challenge 2027 entry" },
+    { label: "Learning", value: "Spanish, for my International Baccalaureate exams" },
+    { label: "Listening", value: "After Hours by The Weeknd" },
+    { label: "Travelling", value: "All around Europe" },
   ],
 
   email: "coenhatcherross@gmail.com",

@@ -12,7 +12,7 @@ export function SceneHeader({
   id,
   lead,
 }: {
-  index: string;
+  index?: string;
   title: string;
   id?: string;
   lead?: ReactNode;
@@ -29,9 +29,11 @@ export function SceneHeader({
             marginBottom: "var(--space-2)",
           }}
         >
-          <span aria-hidden style={{ color: "var(--accent)", fontWeight: 600 }}>
-            {index}
-          </span>
+          {index && (
+            <span aria-hidden style={{ color: "var(--accent)", fontWeight: 600 }}>
+              {index}
+            </span>
+          )}
           <span
             aria-hidden
             style={{
