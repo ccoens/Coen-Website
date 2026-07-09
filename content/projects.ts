@@ -9,22 +9,25 @@ import type { Project } from "./types";
 export const projects: Project[] = [
   {
     id: "project-one",
-    title: "FILL: Project One",
-    year: "2025",
-    role: "Design & Engineering",
+    title: "Improve digital safety for everyone",
+    year: "2025 – present",
+    role: "Public Policy",
     summary:
-      "FILL: one or two sentences on what this project is, the problem it solves, " +
-      "and your role. Concrete beats grand.",
+      "Since 2025, I have worked to make digital spaces safer through " +
+      "collaborations with companies such as Snapchat and organisations " +
+      "including eSafety Australia. My work has focused on exploring " +
+      "responsible approaches to social media regulation, including age " +
+      "restrictions and strategies to better protect vulnerable users online.",
     href: undefined,
     cover: {
       src: "/project1-header.jpg",
-      alt: "FILL: cover image for Project One",
+      alt: "Coen at a Snapchat digital-wellbeing activation",
       width: 8256,
       height: 5504,
     },
     gallery: [
-      { src: "/placeholders/project-1-a.svg", alt: "FILL: detail image", width: 1600, height: 1000 },
-      { src: "/placeholders/project-1-b.svg", alt: "FILL: detail image", width: 1200, height: 1500 },
+      { src: "/project1-2.jpg", alt: "Digital safety work with Snapchat and eSafety Australia", width: 7833, height: 5222 },
+      { src: "/project1-3.jpeg", alt: "Digital safety work with Snapchat and eSafety Australia", width: 1170, height: 631 },
     ],
   },
   {
