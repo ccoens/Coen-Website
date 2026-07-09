@@ -1,24 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { m, useMotionValueEvent, useTransform } from "framer-motion";
+import { m, AnimatePresence, useMotionValueEvent, useTransform } from "framer-motion";
 import { Glass } from "@/components/ui/Glass";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useContact } from "./Contact";
 
 /*
- * Nav — the floating glass layer (§12), now route-aware. The top-left logo is
- * the morphed COEN (HeroLogo); this is the top-right cluster. Section links are
- * real routes (Next <Link>) so navigating triggers the fluid PageTransition;
- * "Contact" is an in-page scroll to the footer.
+ * Nav — the floating glass layer (§12), route-aware and responsive.
  *
- * On the landing route it appears only after the hero morph; on every other
- * route it's present from the first frame. Opacity eases down slightly while
- * scrolling fast. Hover runs a centre-out light-sweep underline; the active
- * route keeps the underline lit.
+ * Desktop (≥768px): the centred glass pill with the gliding active indicator.
+ * Mobile (<768px): the pill would overflow and collide with the COEN logo, so
+ * it collapses to a top-right menu button that opens a full-screen menu. Both
+ * are always rendered; CSS shows the right one per breakpoint (no layout flash,
+ * links stay in the SSR HTML). "Contact" opens the shared contact overlay.
  */
 
 const LINKS = [
@@ -29,6 +27,17 @@ const LINKS = [
 ] as const;
 
 export function Nav() {
+  return (
+    <>
+      <DesktopNav />
+      <MobileNav />
+    </>
+  );
+}
+
+/* ── Desktop pill ─────────────────────────────────────────────────────────── */
+
+function DesktopNav() {
   const reduced = useReducedMotion();
   const pathname = usePathname();
   const { open: openContact } = useContact();
@@ -55,6 +64,7 @@ export function Nav() {
     <m.nav
       aria-label="Primary"
       data-cursor="hidden"
+      className="nav-desktop"
       initial={false}
       animate={{
         opacity: shown ? 1 : 0,
@@ -113,6 +123,198 @@ export function Nav() {
     </m.nav>
   );
 }
+
+/* ── Mobile menu ──────────────────────────────────────────────────────────── */
+
+function MobileNav() {
+  const reduced = useReducedMotion();
+  const pathname = usePathname();
+  const { open: openContact } = useContact();
+  const [open, setOpen] = useState(false);
+
+  // Lock scroll + wire Escape while the menu is open.
+  useEffect(() => {
+    if (!open) return;
+    document.documentElement.classList.add("scroll-locked");
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.documentElement.classList.remove("scroll-locked");
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  // Always close when the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  return (
+    <div className="nav-mobile">
+      {/* Menu / close toggle — top-right, clear of the COEN logo (top-left). */}
+      <button
+        type="button"
+        aria-label={open ? "Close menu" : "Open menu"}
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          position: "fixed",
+          top: 14,
+          right: 14,
+          zIndex: 1001,
+          width: 46,
+          height: 46,
+          borderRadius: 999,
+          border: "1px solid var(--border-strong)",
+          background: "var(--surface-solid)",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+          display: "grid",
+          placeItems: "center",
+          cursor: "pointer",
+        }}
+      >
+        <MenuIcon open={open} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <m.div
+            id="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduced ? 0.12 : 0.32, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 1000,
+              background: "var(--bg)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              padding: "0 var(--margin-mobile)",
+            }}
+          >
+            {/* Soft accent wash for depth. */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(90% 60% at 80% 0%, var(--accent-soft), transparent 60%)",
+                pointerEvents: "none",
+              }}
+            />
+            <nav
+              aria-label="Primary"
+              style={{
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                gap: "var(--space-2)",
+              }}
+            >
+              {LINKS.map((l, i) => (
+                <MobileItem
+                  key={l.href}
+                  index={i}
+                  reduced={reduced}
+                  active={pathname === l.href}
+                >
+                  <Link
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    style={mobileLinkStyle(pathname === l.href)}
+                  >
+                    {l.label}
+                  </Link>
+                </MobileItem>
+              ))}
+              <MobileItem index={LINKS.length} reduced={reduced} active={false}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    openContact();
+                  }}
+                  style={{ ...mobileLinkStyle(false), background: "transparent", border: "none", textAlign: "left", cursor: "pointer" }}
+                >
+                  Contact
+                </button>
+              </MobileItem>
+            </nav>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MobileItem({
+  children,
+  index,
+  reduced,
+  active,
+}: {
+  children: React.ReactNode;
+  index: number;
+  reduced: boolean;
+  active: boolean;
+}) {
+  return (
+    <m.div
+      initial={reduced ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: reduced ? 0 : 0.06 * index + 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}
+    >
+      {active && (
+        <span
+          aria-hidden
+          style={{ width: 8, height: 8, borderRadius: 999, background: "var(--accent)", flexShrink: 0 }}
+        />
+      )}
+      {children}
+    </m.div>
+  );
+}
+
+function mobileLinkStyle(active: boolean) {
+  return {
+    display: "inline-block",
+    fontSize: "clamp(34px, 11vw, 52px)",
+    fontWeight: 600,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.05,
+    textDecoration: "none",
+    color: active ? "var(--accent)" : "var(--text-primary)",
+    padding: "2px 0",
+  } as const;
+}
+
+/* Two-bar icon that morphs between a menu glyph and a close (×). */
+function MenuIcon({ open }: { open: boolean }) {
+  const bar = {
+    position: "absolute" as const,
+    left: 0,
+    width: 18,
+    height: 2,
+    borderRadius: 2,
+    background: "var(--text-primary)",
+    transition: "transform 260ms var(--ease-primary), opacity 200ms var(--ease-primary)",
+  };
+  return (
+    <span aria-hidden style={{ position: "relative", width: 18, height: 12, display: "block" }}>
+      <span style={{ ...bar, top: 1, transform: open ? "translateY(4px) rotate(45deg)" : "none" }} />
+      <span style={{ ...bar, top: 9, transform: open ? "translateY(-4px) rotate(-45deg)" : "none" }} />
+    </span>
+  );
+}
+
+/* ── Shared desktop link ──────────────────────────────────────────────────── */
 
 function NavLink({
   href,

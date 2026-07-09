@@ -121,6 +121,20 @@ body[data-custom-cursor="true"] button {
   margin-inline: auto;
 }
 
+/* Responsive nav: the centred desktop pill would overflow and cover the COEN
+   logo on phones, so below 768px it's hidden and the mobile menu button shows
+   instead. Both are always in the DOM (SSR-friendly, no swap flash). */
+@media (max-width: 767px) {
+  .nav-desktop {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .nav-mobile {
+    display: none !important;
+  }
+}
+
 /* Locks background scroll while an immersive project expansion is open. Lenis
    drives window scroll, so removing overflow stops the wheel from doing work. */
 html.scroll-locked,
