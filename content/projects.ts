@@ -17,10 +17,10 @@ export const projects: Project[] = [
       "and your role. Concrete beats grand.",
     href: undefined,
     cover: {
-      src: "/placeholders/project-1-cover.svg",
+      src: "/project1-header.jpg",
       alt: "FILL: cover image for Project One",
-      width: 1600,
-      height: 1000,
+      width: 8256,
+      height: 5504,
     },
     gallery: [
       { src: "/placeholders/project-1-a.svg", alt: "FILL: detail image", width: 1600, height: 1000 },
