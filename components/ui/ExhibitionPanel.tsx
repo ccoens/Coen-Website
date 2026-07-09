@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { m, AnimatePresence, type Transition } from "framer-motion";
 import type { Project } from "@/content/types";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -110,18 +110,28 @@ export function ProjectExpansion({
   const reduced = useReducedMotion();
   const { canBlur, ready } = useCapability();
   const useBlur = ready && canBlur;
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
-  // Lock background scroll + wire Escape while an expansion is open.
+  // Lock background scroll, wire Escape, and manage focus while open (§17).
   useEffect(() => {
     if (!project) return;
     document.documentElement.classList.add("scroll-locked");
+    // Remember what was focused so we can restore it on close.
+    returnFocusRef.current = document.activeElement as HTMLElement | null;
+    // Move focus into the dialog once it has mounted.
+    const raf = requestAnimationFrame(() => closeRef.current?.focus());
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => {
+      cancelAnimationFrame(raf);
       document.documentElement.classList.remove("scroll-locked");
       window.removeEventListener("keydown", onKey);
+      // Restore focus to the panel that opened this expansion.
+      returnFocusRef.current?.focus?.();
     };
   }, [project, onClose]);
 
@@ -216,6 +226,7 @@ export function ProjectExpansion({
                   </p>
                 </div>
                 <button
+                  ref={closeRef}
                   type="button"
                   onClick={onClose}
                   aria-label="Close project"

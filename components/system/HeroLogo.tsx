@@ -69,6 +69,10 @@ export function HeroLogo() {
     heroScale: 6,
   });
   const [isNav, setIsNav] = useState(false);
+  // The logo is a fixed overlay; over the dark Photography scene, dark text
+  // would vanish. Track whether a dark section sits under the docked mark and
+  // flip its colour so it reads on any field.
+  const [overDark, setOverDark] = useState(false);
 
   // Pointer position, normalised to [-1, 1], for the hero per-char parallax.
   const px = useMotionValue(0);
@@ -135,6 +139,18 @@ export function HeroLogo() {
     setIsNav((prev) => (prev !== nav ? nav : prev));
   });
 
+  // Flip the mark's colour when a dark section passes under the docked logo.
+  useMotionValueEvent(scrollY, "change", () => {
+    const el = document.getElementById("photography");
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const probeY = 30; // the docked logo sits ~30px from the top
+    setOverDark((prev) => {
+      const next = r.top <= probeY && r.bottom >= probeY;
+      return prev !== next ? next : prev;
+    });
+  });
+
   // Hero pointer parallax. Only meaningful near the top; disabled if calm/touch.
   useEffect(() => {
     if (reduced || !finePointer) return;
@@ -188,7 +204,8 @@ export function HeroLogo() {
           fontWeight: 600,
           letterSpacing: "-0.03em",
           lineHeight: 0.95,
-          color: "var(--text-primary)",
+          color: overDark ? "var(--dark-text-primary)" : "var(--text-primary)",
+          transition: "color 300ms var(--ease-primary)",
           userSelect: "none",
           cursor: isNav ? "pointer" : "default",
         }}
