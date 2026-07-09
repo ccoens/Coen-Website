@@ -5,6 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Tilt } from "@/components/ui/Tilt";
 import { Float } from "@/components/ui/Float";
 import { VelocitySkew } from "@/components/ui/VelocitySkew";
+import { Magnetic } from "@/components/ui/Magnetic";
 
 /*
  * FeaturedWork — the landing's curated glimpse of the work (not the full grid).
@@ -32,14 +33,16 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
             <h2 id="featured-title" className="type-h2" style={{ fontSize: "clamp(32px, 5vw, 72px)" }}>
               Selected work
             </h2>
-            <Link
-              href="/projects"
-              data-cursor="interactive"
-              className="type-body"
-              style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}
-            >
-              All projects →
-            </Link>
+            <Magnetic strength={0.3}>
+              <Link
+                href="/projects"
+                data-cursor="interactive"
+                className="type-body"
+                style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}
+              >
+                All projects →
+              </Link>
+            </Magnetic>
           </div>
         </Reveal>
 
@@ -69,6 +72,7 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
                   >
                     <div
                       data-cursor="image"
+                      className="featured-cover"
                       style={{
                         position: "relative",
                         aspectRatio: "4 / 3",
@@ -83,6 +87,8 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
                         sizes="(max-width: 900px) 100vw, 33vw"
                         style={{ objectFit: "cover" }}
                       />
+                      {/* Cinematic light-sweep + warm zoom on hover (CSS in globals). */}
+                      <span aria-hidden className="featured-sheen" />
                     </div>
                     <div style={{ padding: "var(--space-3)", transform: "translateZ(45px)" }}>
                       <h3 className="type-h3" style={{ fontSize: "clamp(20px, 2vw, 26px)" }}>

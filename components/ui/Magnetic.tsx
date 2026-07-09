@@ -16,11 +16,14 @@ export function Magnetic({
   children,
   strength = 0.35,
   className,
+  block = false,
 }: {
   children: ReactNode;
   /** Fraction of the cursor offset the element follows. */
   strength?: number;
   className?: string;
+  /** Render as a full-width block instead of the default inline-flex. */
+  block?: boolean;
 }) {
   const reduced = useReducedMotion();
   const { finePointer, ready } = useCapability();
@@ -53,7 +56,12 @@ export function Magnetic({
       className={className}
       onPointerMove={onMove}
       onPointerLeave={reset}
-      style={{ x: sx, y: sy, display: "inline-flex", willChange: "transform" }}
+      style={{
+        x: sx,
+        y: sy,
+        display: block ? "block" : "inline-flex",
+        willChange: "transform",
+      }}
     >
       {children}
     </m.div>

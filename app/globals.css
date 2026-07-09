@@ -153,6 +153,45 @@ html.scroll-locked body {
   }
 }
 
+/* Cinematic FeaturedWork hover — a warm zoom on the cover plus a single
+   diagonal specular sweep, entirely CSS so it costs nothing. The zoom is
+   clipped by the cover's overflow:hidden. Honours reduced motion. */
+.featured-cover img {
+  transition:
+    transform 800ms var(--ease-primary),
+    filter 800ms var(--ease-primary);
+  will-change: transform;
+}
+.featured-tile:hover .featured-cover img {
+  transform: scale(1.06);
+  filter: saturate(1.08) brightness(1.03);
+}
+.featured-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.42) 50%,
+    transparent 65%
+  );
+  transform: translateX(-130%);
+  transition: transform 900ms var(--ease-primary);
+}
+.featured-tile:hover .featured-sheen {
+  transform: translateX(130%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .featured-tile:hover .featured-cover img {
+    transform: none;
+  }
+  .featured-sheen {
+    display: none;
+  }
+}
+
 /* Accessible skip link — visible only when focused (§17). */
 .skip-link {
   position: fixed;

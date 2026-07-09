@@ -14,6 +14,7 @@ import { m, AnimatePresence } from "framer-motion";
 import { profile } from "@/content/profile";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useCapability } from "@/lib/capability";
+import { Magnetic } from "@/components/ui/Magnetic";
 
 /*
  * Contact (§13/§17) — the site's single contact surface. Clicking "Contact" in
@@ -283,26 +284,28 @@ function ContactOverlay({
               </div>
 
               {/* Primary action */}
-              <a
-                href={`mailto:${profile.email}`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  marginTop: "var(--space-3)",
-                  padding: "14px 20px",
-                  borderRadius: "999px",
-                  background: "var(--accent)",
-                  color: "#fff",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  fontSize: "var(--fs-body)",
-                  boxShadow: "0 10px 30px hsl(var(--accent-h) var(--accent-s) 50% / 0.35)",
-                }}
-              >
-                Email me <span aria-hidden>→</span>
-              </a>
+              <Magnetic strength={0.4} block>
+                <a
+                  href={`mailto:${profile.email}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    marginTop: "var(--space-3)",
+                    padding: "14px 20px",
+                    borderRadius: "999px",
+                    background: "var(--accent)",
+                    color: "#fff",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    fontSize: "var(--fs-body)",
+                    boxShadow: "0 10px 30px hsl(var(--accent-h) var(--accent-s) 50% / 0.35)",
+                  }}
+                >
+                  Email me <span aria-hidden>→</span>
+                </a>
+              </Magnetic>
 
               {realSocials.length > 0 && (
                 <div

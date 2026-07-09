@@ -30,6 +30,7 @@ uniform float uTime;
 uniform vec2 uMouse;   // normalised 0..1, y-down
 uniform float uHue;    // degrees
 uniform float uDaylight; // 0 = Canberra deep night, 1 = midday
+uniform float uEnergy;   // 0 = idle/settled, 1 = fully awake (recent movement)
 
 float hash(vec2 p){ p = fract(p*vec2(123.34,345.45)); p += dot(p, p+34.345); return fract(p.x*p.y); }
 float noise(vec2 p){
@@ -55,10 +56,11 @@ void main(){
   vec2 p = uv; p.x *= uRes.x/uRes.y;
   float t = uTime*0.045;
 
-  // Cursor warps the field locally.
+  // Cursor warps the field locally. The warp (and later the light lift) fade as
+  // the field settles into its idle state, so it visibly relaxes when untouched.
   vec2 m = uMouse; m.x *= uRes.x/uRes.y;
   float md = distance(p, m);
-  vec2 warp = (p - m) * exp(-md*3.0) * 0.25;
+  vec2 warp = (p - m) * exp(-md*3.0) * 0.25 * uEnergy;
 
   vec2 q = vec2(fbm(p + t + warp), fbm(p + vec2(5.2,1.3) - t));
   vec2 r = vec2(fbm(p + 3.5*q + vec2(1.7,9.2) + 0.15*t),
@@ -77,12 +79,16 @@ void main(){
   col = mix(col, c1, clamp(f*f*mix(1.7,1.3,uDaylight), 0.0, 1.0));
   col = mix(col, c2, clamp(length(r)*0.5, 0.0, 0.6));
 
-  // Soft light lift near the cursor.
-  col += hsl2rgb(uHue + hueShift, 0.4, 0.7) * exp(-md*2.6) * 0.13;
+  // Soft light lift near the cursor — brightest when awake, gone when idle.
+  col += hsl2rgb(uHue + hueShift, 0.4, 0.7) * exp(-md*2.6) * 0.13 * uEnergy;
 
   // Gentle vignette so edges settle into the page.
   float vig = smoothstep(1.25, 0.35, length(uv-0.5));
   col = mix(base, col, 0.55 + 0.45*vig);
+
+  // When idle the whole field dims a hair and eases toward its base wash — a
+  // slow exhale. Barely perceptible frame to frame, clearly felt over seconds.
+  col = mix(mix(base, col, 0.92), col, uEnergy);
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -140,6 +146,7 @@ export function ShaderHero() {
     const uMouse = gl.getUniformLocation(prog, "uMouse");
     const uHue = gl.getUniformLocation(prog, "uHue");
     const uDaylight = gl.getUniformLocation(prog, "uDaylight");
+    const uEnergy = gl.getUniformLocation(prog, "uEnergy");
 
     // Cap DPR — this is a soft background, not crisp UI.
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -160,9 +167,14 @@ export function ShaderHero() {
       my = 0.4,
       tmx = 0.5,
       tmy = 0.4;
+    // Awake/idle state: every pointer move refreshes lastMove; after a few
+    // seconds of stillness `energy` eases down and the field slows + settles.
+    let lastMove = performance.now();
+    let energy = 1;
     const onMove = (e: PointerEvent) => {
       tmx = e.clientX / window.innerWidth;
       tmy = e.clientY / window.innerHeight;
+      lastMove = performance.now();
     };
     window.addEventListener("pointermove", onMove, { passive: true });
 
@@ -189,23 +201,37 @@ export function ShaderHero() {
 
     let raf = 0;
     let frame = 0;
-    const start = performance.now();
+    // Flow time is accumulated (not wall-clock) so it can be slowed by `energy`
+    // and never jumps when the loop pauses off-screen / on a hidden tab.
+    let tAcc = 0;
+    let prev = performance.now();
     const loop = (now: number) => {
       if (document.hidden || !onScreen) {
         raf = 0;
+        prev = performance.now(); // avoid a dt spike when it resumes
         return; // IO / visibility change will restart it
       }
       if (frame % 90 === 0) sample();
       frame++;
+      const dt = Math.min((now - prev) / 1000, 0.05);
+      prev = now;
+
+      // Ease energy toward awake (1) or settled (~0.28) by time since last move.
+      const idle = now - lastMove;
+      energy += ((idle > 3500 ? 0.28 : 1) - energy) * 0.02;
+      // Flow slows as it settles but keeps a slow idle drift (never fully stops).
+      tAcc += dt * (0.4 + 0.6 * energy);
+
       // Ease the cursor influence.
       mx += (tmx - mx) * 0.06;
       my += (tmy - my) * 0.06;
 
       gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, (now - start) / 1000);
+      gl.uniform1f(uTime, tAcc);
       gl.uniform2f(uMouse, mx, 1 - my); // flip to gl y-up
       gl.uniform1f(uHue, hue);
       gl.uniform1f(uDaylight, daylight);
+      gl.uniform1f(uEnergy, energy);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(loop);
     };

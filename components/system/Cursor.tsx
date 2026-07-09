@@ -46,9 +46,6 @@ export function Cursor() {
     if (!active) return;
 
     const onMove = (e: PointerEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-
       // Derive speed → a small directional stretch (max ~0.18).
       const now = performance.now();
       const dt = Math.max(now - last.current.t, 1);
@@ -61,11 +58,31 @@ export function Cursor() {
 
       // Classify what's under the cursor for the state morph.
       const el = e.target as Element | null;
-      if (el?.closest('[data-cursor="hidden"]')) setState("hidden");
-      else if (el?.closest('[data-cursor="image"], img')) setState("image");
-      else if (el?.closest('a, button, [data-cursor="interactive"], input, textarea'))
-        setState("interactive");
-      else setState("default");
+      const hidden = !!el?.closest('[data-cursor="hidden"]');
+      const image = !hidden && !!el?.closest('[data-cursor="image"], img');
+      const interactiveEl =
+        !hidden && !image
+          ? (el?.closest(
+              'a, button, [data-cursor="interactive"], input, textarea',
+            ) as HTMLElement | null)
+          : null;
+
+      // Magnetic pull: for compact interactive targets, ease the orb toward the
+      // element's centre so it visibly "snaps" to buttons. Large hit areas (a
+      // link wrapping a whole card) are skipped so it never yanks across the page.
+      let px = e.clientX;
+      let py = e.clientY;
+      if (interactiveEl) {
+        const r = interactiveEl.getBoundingClientRect();
+        if (r.width < 440 && r.height < 150) {
+          px += (r.left + r.width / 2 - e.clientX) * 0.32;
+          py += (r.top + r.height / 2 - e.clientY) * 0.32;
+        }
+      }
+      x.set(px);
+      y.set(py);
+
+      setState(hidden ? "hidden" : image ? "image" : interactiveEl ? "interactive" : "default");
     };
 
     const onDown = () => setPressed(true);

@@ -49,3 +49,21 @@ export function canberraNow(date: Date = new Date()): CanberraNow {
 
   return { hh, mm, ss, hour: hourNum, partOfDay, daylight };
 }
+
+/*
+ * A single human, context-aware line about where the day is at in Canberra —
+ * the site narrating Coen's real time, not a generic label. Purely a function of
+ * the local hour, so it changes through the day and reads as quiet awareness.
+ */
+export function canberraStatus(now: CanberraNow = canberraNow()): string {
+  const h = now.hour;
+  if (h < 5) return "The middle of the night in Canberra — Coen is asleep.";
+  if (h < 7) return "First light in Canberra — the city is still waking.";
+  if (h < 9) return "Morning in Canberra — Coen is likely just getting started.";
+  if (h < 12) return "Mid-morning in Canberra — probably deep in a project.";
+  if (h < 14) return "Midday in Canberra.";
+  if (h < 17) return "Afternoon in Canberra — heads-down in the work.";
+  if (h < 20) return "Evening in Canberra — winding down the day.";
+  if (h < 23) return "Night in Canberra — Coen is probably reading or building.";
+  return "Late night in Canberra — the city is quiet.";
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { m } from "framer-motion";
-import { canberraNow } from "@/lib/time";
+import { canberraNow, canberraStatus } from "@/lib/time";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 /*
@@ -110,9 +110,9 @@ export function CanberraTime() {
 
         <p
           className="type-body"
-          style={{ color: "var(--text-secondary)", marginTop: "var(--space-3)" }}
+          style={{ color: "var(--text-secondary)", marginTop: "var(--space-3)", maxWidth: "34ch", minHeight: "1.6em" }}
         >
-          {mounted ? `${now.partOfDay} where Coen is` : " "}
+          {mounted ? canberraStatus(now) : " "}
         </p>
       </m.div>
     </section>
