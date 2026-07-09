@@ -1,0 +1,136 @@
+/*
+ * tokens.css — the single source of design truth.
+ * Every colour, size, spacing step, easing and spring reference in the app
+ * resolves to one of these custom properties. Tailwind v4 consumes them via
+ * @theme in globals.css; components read them directly with var().
+ *
+ * Grounded in the coen.life build spec §3–§9. Numbers here are constraints,
+ * not suggestions.
+ */
+
+:root {
+  /* ---- Colour: light-first field (§4) -------------------------------- */
+  --bg: #f7f7f5; /* pale, warm off-white field */
+  --surface: rgba(255, 255, 255, 0.6);
+  --surface-solid: #fbfbf9; /* capability fallback: opaque, no blur */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+
+  --text-primary: rgba(0, 0, 0, 0.85);
+  --text-secondary: rgba(0, 0, 0, 0.62); /* nudged from spec 0.55 -> 4.6:1 on --bg */
+  --text-tertiary: rgba(0, 0, 0, 0.56); /* nudged from spec 0.40 -> 4.6:1; light 0.40 reserved for large glyphs only */
+  --text-tertiary-large: rgba(0, 0, 0, 0.4); /* spec value; only for >=24px non-essential text */
+
+  /* Occasional dark scene (Photography) — the exception, not a theme. */
+  --dark-bg: #0a0a0b;
+  --dark-surface: rgba(255, 255, 255, 0.06);
+  --dark-border: rgba(255, 255, 255, 0.12);
+  --dark-text-primary: rgba(255, 255, 255, 0.92);
+  --dark-text-secondary: rgba(255, 255, 255, 0.62);
+  --dark-text-tertiary: rgba(255, 255, 255, 0.48);
+
+  /* ---- Accent: single dynamic hue (§4) ------------------------------- *
+   * --accent-h is written every frame by lib/accent.ts (seeded by date+hour,
+   * slow drift on top). Saturation <= 40%, lightness ~62%. Muted, never neon.
+   */
+  --accent-h: 232; /* fallback seed; JS overwrites on mount */
+  --accent-s: 38%;
+  --accent-l: 62%;
+  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+  --accent-soft: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.16);
+  --accent-glow: hsl(var(--accent-h) var(--accent-s) 70% / 0.35);
+
+  /* ---- Light field (§7) ---------------------------------------------- *
+   * Written by one shared rAF loop in lib/light.ts. Consumers use these only
+   * inside transforms / gradients / opacity — never layout-affecting props.
+   */
+  --light-x: 50%;
+  --light-y: 40%;
+  --light-intensity: 0.5;
+
+  /* ---- Typography scale (§5) ----------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --fs-h1: clamp(72px, 12vw, 140px);
+  --fs-h2: clamp(40px, 6vw, 96px);
+  --fs-h3: clamp(28px, 3vw, 40px);
+  --fs-body: clamp(16px, 1.2vw, 18px);
+  --fs-caption: clamp(12px, 0.9vw, 14px);
+
+  --lh-h1: 0.95;
+  --lh-h2: 1.02;
+  --lh-h3: 1.1;
+  --lh-body: 1.6;
+  --lh-caption: 1.4;
+
+  --ls-h1: -0.03em;
+  --ls-h2: -0.02em;
+  --ls-caption: 0.02em;
+
+  /* ---- Spacing scale, 8px base (§3) ---------------------------------- */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 128px;
+  --space-9: 192px;
+
+  /* ---- Layout (§3) --------------------------------------------------- */
+  --content-max: 1320px;
+  --margin-desktop: 80px;
+  --margin-tablet: 40px;
+  --margin-mobile: 20px;
+  --nav-margin: 20px; /* right offset for the floating nav; widened at breakpoints */
+
+  /* ---- Glass material (§6) ------------------------------------------- */
+  --glass-blur: 16px; /* default; range 12–24 */
+  --glass-fill: var(--surface);
+  --glass-edge: rgba(255, 255, 255, 0.5);
+  --glass-noise-opacity: 0.03; /* 2–4%, static */
+
+  /* ---- Depth z-layers (§6) ------------------------------------------- */
+  --z-bg: 0;
+  --z-blur-plane: -1;
+  --z-glass: 1;
+  --z-content: 2;
+  --z-cursor: 3;
+  --z-nav: 40;
+
+  /* ---- Motion: easing (§8) ------------------------------------------- */
+  --ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-ambient: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Motion: duration (§8) ----------------------------------------- */
+  --dur-micro: 150ms;
+  --dur-ui: 420ms;
+  --dur-section: 1000ms;
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --nav-margin: 40px;
+  }
+}
+@media (min-width: 1120px) {
+  :root {
+    --nav-margin: 40px;
+  }
+}
+
+/* Reduced motion pins the light field to a calm static state (§7, §17). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --light-x: 50%;
+    --light-y: 35%;
+    --light-intensity: 0.4;
+  }
+}

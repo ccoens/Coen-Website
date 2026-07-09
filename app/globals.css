@@ -1,0 +1,189 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+/*
+ * Tailwind v4 CSS-first theme: expose our design tokens as Tailwind utilities
+ * so scenes can use e.g. `text-primary`, `bg-bg`, `max-w-content` while the
+ * source of truth stays in tokens.css.
+ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-accent: var(--accent);
+
+  --font-sans: var(--font-sans);
+
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+  --spacing-8: var(--space-8);
+  --spacing-9: var(--space-9);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --max-width-content: var(--content-max);
+
+  --ease-primary: var(--ease-primary);
+  --ease-ambient: var(--ease-ambient);
+  --ease-exit: var(--ease-exit);
+}
+
+/* Minimal, deliberate base layer. The CSS reset comes from Tailwind preflight. */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: auto; /* Lenis owns smoothing; never let the browser fight it. */
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  overflow-x: hidden;
+  /* Physics cursor replaces the native one on fine pointers (§10); toggled by a
+     data attribute set from lib/capability so touch keeps the native cursor. */
+}
+
+body[data-custom-cursor="true"] {
+  cursor: none;
+}
+body[data-custom-cursor="true"] a,
+body[data-custom-cursor="true"] button {
+  cursor: none;
+}
+
+/* Type primitives — structural, carry as much weight as imagery (§5). */
+.type-h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+  letter-spacing: var(--ls-h1);
+  font-weight: 600;
+}
+.type-h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
+  font-weight: 600;
+}
+.type-h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  font-weight: 500;
+}
+.type-body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+}
+.type-caption {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  letter-spacing: var(--ls-caption);
+  color: var(--text-tertiary);
+  font-weight: 450;
+}
+
+/* Section rhythm helper: honours the 8px scale margins (§3). */
+.scene {
+  position: relative;
+  width: 100%;
+  padding-inline: var(--margin-mobile);
+  padding-block: var(--space-8);
+}
+@media (min-width: 768px) {
+  .scene {
+    padding-inline: var(--margin-tablet);
+  }
+}
+@media (min-width: 1120px) {
+  .scene {
+    padding-inline: var(--margin-desktop);
+  }
+}
+
+.scene-inner {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+/* Accessible skip link — visible only when focused (§17). */
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-1) var(--space-3);
+  background: var(--text-primary);
+  color: var(--bg);
+  border-radius: var(--radius-sm);
+  transition: top var(--dur-micro) var(--ease-primary);
+}
+.skip-link:focus-visible {
+  top: var(--space-2);
+}
+
+/* Visible, calm focus ring everywhere (§17). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/*
+ * Background mesh drift (§9). Extremely slow (8–15 min) transform loops on a few
+ * soft radial blobs. Imperceptible per-frame; GPU-friendly (transform/opacity
+ * only). The global reduced-motion rule below pins these to their first frame.
+ */
+@keyframes meshDriftA {
+  0% { transform: translate3d(-6%, -4%, 0) scale(1.05); }
+  50% { transform: translate3d(5%, 3%, 0) scale(1.12); }
+  100% { transform: translate3d(-6%, -4%, 0) scale(1.05); }
+}
+@keyframes meshDriftB {
+  0% { transform: translate3d(4%, 6%, 0) scale(1.1); }
+  50% { transform: translate3d(-5%, -3%, 0) scale(1.03); }
+  100% { transform: translate3d(4%, 6%, 0) scale(1.1); }
+}
+@keyframes meshDriftC {
+  0% { transform: translate3d(2%, -5%, 0) scale(1.08); }
+  50% { transform: translate3d(-3%, 4%, 0) scale(1.15); }
+  100% { transform: translate3d(2%, -5%, 0) scale(1.08); }
+}
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  will-change: transform;
+}
+
+/* When the OS asks for less motion, we let CSS transitions collapse to instant
+   as a belt-and-braces measure; JS paths also branch on the same signal. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

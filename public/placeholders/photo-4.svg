@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1050" viewBox="0 0 1400 1050" role="img" aria-label="Placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="rgb(232,232,230)"/>
+      <stop offset="1" stop-color="rgb(222,222,220)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="1050" fill="url(#g)"/>
+  <rect x="1" y="1" width="1398" height="1048" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="2"/>
+  <g fill="rgba(0,0,0,0.34)" font-family="ui-sans-serif, system-ui, sans-serif" text-anchor="middle">
+    <text x="700" y="514.4" font-size="53" font-weight="600" letter-spacing="0.02em">FILL: image</text>
+    <text x="700" y="583.3" font-size="33" fill="rgba(0,0,0,0.26)">1400 × 1050</text>
+  </g>
+</svg>
