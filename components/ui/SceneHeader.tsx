@@ -30,19 +30,21 @@ export function SceneHeader({
           }}
         >
           {index && (
-            <span aria-hidden style={{ color: "var(--accent)", fontWeight: 600 }}>
-              {index}
-            </span>
+            <>
+              <span aria-hidden style={{ color: "var(--accent)", fontWeight: 600 }}>
+                {index}
+              </span>
+              <span
+                aria-hidden
+                style={{
+                  width: 28,
+                  height: 1,
+                  background: "var(--border-strong)",
+                  display: "inline-block",
+                }}
+              />
+            </>
           )}
-          <span
-            aria-hidden
-            style={{
-              width: 28,
-              height: 1,
-              background: "var(--border-strong)",
-              display: "inline-block",
-            }}
-          />
           <span style={{ textTransform: "uppercase" }}>{title}</span>
         </p>
       </Reveal>
