@@ -2,6 +2,7 @@
 
 import { m, useTransform } from "framer-motion";
 import { GlassButton } from "@/components/ui/GlassButton";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
@@ -83,12 +84,14 @@ export function Hero({ statement }: { statement: string }) {
           {statement}
         </p>
 
-        <GlassButton onClick={() => scrollTo("about")}>
-          See the work
-          <span aria-hidden style={{ opacity: 0.5 }}>
-            ↓
-          </span>
-        </GlassButton>
+        <Magnetic strength={0.4}>
+          <GlassButton onClick={() => scrollTo("work")}>
+            See the work
+            <span aria-hidden style={{ opacity: 0.5 }}>
+              ↓
+            </span>
+          </GlassButton>
+        </Magnetic>
       </m.div>
     </section>
   );

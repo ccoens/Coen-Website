@@ -10,7 +10,13 @@ import { stagger } from "@/lib/motion";
  * a 40ms stagger, a portrait on the right drifting on parallax. Server
  * component — only the Reveal/Parallax leaves are client.
  */
-export function About({ profile }: { profile: Profile }) {
+export function About({
+  profile,
+  hideHeader = false,
+}: {
+  profile: Profile;
+  hideHeader?: boolean;
+}) {
   // Break the about copy into sentence-ish lines for the staggered reveal.
   const lines = profile.about
     .split(/(?<=\.)\s+/)
@@ -20,7 +26,7 @@ export function About({ profile }: { profile: Profile }) {
   return (
     <section id="about" className="scene" aria-labelledby="about-title">
       <div className="scene-inner">
-        <SceneHeader index="01" title="About" />
+        {!hideHeader && <SceneHeader index="01" title="About" />}
 
         <div
           style={{

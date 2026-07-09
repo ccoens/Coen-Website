@@ -1,44 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { m, useMotionValueEvent, useTransform } from "framer-motion";
 import { Glass } from "@/components/ui/Glass";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 /*
- * Nav — the floating glass layer (§12). Not a bar. The top-left logo is the
- * morphed COEN (HeroLogo, rendered separately); this is the top-right link
- * cluster. It appears only once the hero morph has essentially completed, and
- * its opacity eases down slightly while the page is scrolling fast, settling to
- * full when the scroll rests. Hover thickens the glass and runs a centre-out
- * light-sweep underline.
+ * Nav — the floating glass layer (§12), now route-aware. The top-left logo is
+ * the morphed COEN (HeroLogo); this is the top-right cluster. Section links are
+ * real routes (Next <Link>) so navigating triggers the fluid PageTransition;
+ * "Contact" is an in-page scroll to the footer.
+ *
+ * On the landing route it appears only after the hero morph; on every other
+ * route it's present from the first frame. Opacity eases down slightly while
+ * scrolling fast. Hover runs a centre-out light-sweep underline; the active
+ * route keeps the underline lit.
  */
 
-const SECTIONS = [
-  { id: "about", label: "About" },
-  { id: "projects", label: "Projects" },
-  { id: "photography", label: "Photography" },
-  { id: "journal", label: "Journal" },
-  { id: "current", label: "Current" },
-  { id: "contact", label: "Contact" },
+const LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/projects", label: "Projects" },
+  { href: "/photography", label: "Photography" },
+  { href: "/journal", label: "Journal" },
 ] as const;
 
 export function Nav() {
   const reduced = useReducedMotion();
+  const pathname = usePathname();
   const { scrollY, velocity, scrollTo } = useScrollProgress();
-  const [shown, setShown] = useState(false);
+  const isHome = pathname === "/";
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
-  // Reveal after the morph: ~60% of the first viewport scrolled.
+  // On home, reveal after ~60% of the first viewport; elsewhere, always shown.
   useMotionValueEvent(scrollY, "change", (y) => {
-    const threshold = window.innerHeight * 0.6;
-    setShown((prev) => {
-      const next = y > threshold;
-      return prev !== next ? next : prev;
-    });
+    const past = y > window.innerHeight * 0.6;
+    setScrolledPastHero((prev) => (prev !== past ? past : prev));
   });
+  const shown = !isHome || scrolledPastHero;
 
-  // Opacity dips while scrolling fast, returns to full at rest (§12).
   const velOpacity = useTransform(velocity, (v) =>
     reduced ? 1 : 1 - Math.min(Math.abs(v) * 0.012, 0.35),
   );
@@ -72,15 +74,24 @@ export function Nav() {
               margin: 0,
             }}
           >
-            {SECTIONS.map((s) => (
-              <li key={s.id}>
+            {LINKS.map((l) => (
+              <li key={l.href}>
                 <NavLink
-                  label={s.label}
-                  onClick={() => scrollTo(s.id)}
+                  href={l.href}
+                  label={l.label}
+                  active={pathname === l.href}
                   reduced={reduced}
                 />
               </li>
             ))}
+            <li>
+              <NavLink
+                label="Contact"
+                active={false}
+                reduced={reduced}
+                onClick={() => scrollTo("contact")}
+              />
+            </li>
           </ul>
         </Glass>
       </m.div>
@@ -89,55 +100,76 @@ export function Nav() {
 }
 
 function NavLink({
+  href,
   label,
-  onClick,
+  active,
   reduced,
+  onClick,
 }: {
+  href?: string;
   label: string;
-  onClick: () => void;
+  active: boolean;
   reduced: boolean;
+  onClick?: () => void;
 }) {
   const [hover, setHover] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+  const lit = hover || active;
+
+  const style = {
+    position: "relative" as const,
+    display: "inline-block",
+    background: "transparent",
+    border: "none",
+    padding: "8px 12px",
+    borderRadius: "999px",
+    fontSize: "var(--fs-caption)",
+    fontWeight: 500,
+    letterSpacing: "0.01em",
+    color: lit ? "var(--text-primary)" : "var(--text-secondary)",
+    transition: "color 200ms var(--ease-primary)",
+    whiteSpace: "nowrap" as const,
+    textDecoration: "none",
+    cursor: "pointer",
+  };
+
+  const underline = (
+    <m.span
+      aria-hidden
+      initial={false}
+      animate={{ scaleX: lit ? 1 : 0, opacity: lit ? 1 : 0 }}
+      transition={{ duration: reduced ? 0.12 : 0.4, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        position: "relative",
-        background: "transparent",
-        border: "none",
-        padding: "8px 12px",
-        borderRadius: "999px",
-        fontSize: "var(--fs-caption)",
-        fontWeight: 500,
-        letterSpacing: "0.01em",
-        color: hover ? "var(--text-primary)" : "var(--text-secondary)",
-        transition: "color 200ms var(--ease-primary)",
-        whiteSpace: "nowrap",
+        position: "absolute",
+        left: 12,
+        right: 12,
+        bottom: 4,
+        height: 1.5,
+        transformOrigin: "center",
+        background: "linear-gradient(90deg, transparent, var(--accent), transparent)",
       }}
-    >
+    />
+  );
+
+  const handlers = {
+    onPointerEnter: () => setHover(true),
+    onPointerLeave: () => setHover(false),
+    onFocus: () => setHover(true),
+    onBlur: () => setHover(false),
+  };
+
+  if (href) {
+    return (
+      <Link href={href} style={style} aria-current={active ? "page" : undefined} {...handlers}>
+        {label}
+        {underline}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} style={style} {...handlers}>
       {label}
-      {/* Centre-out light-sweep underline (§12, §14). */}
-      <m.span
-        aria-hidden
-        initial={false}
-        animate={{ scaleX: hover ? 1 : 0, opacity: hover ? 1 : 0 }}
-        transition={{ duration: reduced ? 0.12 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: "absolute",
-          left: 12,
-          right: 12,
-          bottom: 4,
-          height: 1.5,
-          transformOrigin: "center",
-          background:
-            "linear-gradient(90deg, transparent, var(--accent), transparent)",
-        }}
-      />
+      {underline}
     </button>
   );
 }

@@ -14,7 +14,13 @@ import {
  * History API WITHOUT remounting, so a shared link deep-links straight to the
  * open project with no visual cut. Back/forward also work.
  */
-export function Projects({ projects }: { projects: Project[] }) {
+export function Projects({
+  projects,
+  hideHeader = false,
+}: {
+  projects: Project[];
+  hideHeader?: boolean;
+}) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = projects.find((p) => p.id === activeId) ?? null;
 
@@ -46,12 +52,14 @@ export function Projects({ projects }: { projects: Project[] }) {
   return (
     <section id="projects" className="scene" aria-labelledby="projects-title">
       <div className="scene-inner">
-        <SceneHeader
-          index="02"
-          title="Projects"
-          id="projects-title"
-          lead="Things made with care."
-        />
+        {!hideHeader && (
+          <SceneHeader
+            index="02"
+            title="Projects"
+            id="projects-title"
+            lead="Things made with care."
+          />
+        )}
 
         <div
           className="projects-grid"

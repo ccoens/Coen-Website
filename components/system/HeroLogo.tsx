@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   m,
   useMotionValue,
@@ -58,6 +59,14 @@ export function HeroLogo() {
   const { finePointer } = useCapability();
   const { scrollY } = useScrollProgress();
 
+  // Only the landing route runs the scroll morph. On every other route the mark
+  // is simply the docked nav logo from the first frame.
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHome = pathname === "/";
+  const isHomeRef = useRef(isHome);
+  isHomeRef.current = isHome;
+
   const ref = useRef<HTMLDivElement>(null);
   const geom = useRef<Geom>({
     vw: 1200,
@@ -103,11 +112,25 @@ export function HeroLogo() {
     return () => window.removeEventListener("resize", measure);
   }, [measure]);
 
-  // heroAmt: 1 at the top, 0 once the mark has fully docked. The morph completes
-  // over ~55% of the first viewport — a continuous, unhurried hand-off.
-  const heroAmt = useTransform(scrollY, (y) =>
-    clamp(1 - y / (geom.current.vh * 0.55), 0, 1),
-  );
+  // heroAmt: 1 at the top of home, 0 once the mark has fully docked. The morph
+  // completes over ~55% of the first viewport — a continuous, unhurried hand-off.
+  // It's a settable value (not a pure scroll transform) so route changes can
+  // force the docked state even when the scroll position doesn't change.
+  const heroAmt = useMotionValue(isHome ? 1 : 0);
+  const recomputeHeroAmt = useCallback(() => {
+    if (!isHomeRef.current) {
+      heroAmt.set(0);
+      return;
+    }
+    const y = scrollY.get();
+    heroAmt.set(clamp(1 - y / (geom.current.vh * 0.55), 0, 1));
+  }, [heroAmt, scrollY]);
+
+  useMotionValueEvent(scrollY, "change", recomputeHeroAmt);
+  // Re-evaluate on navigation: leaving home docks it, returning re-morphs.
+  useEffect(() => {
+    recomputeHeroAmt();
+  }, [isHome, recomputeHeroAmt]);
 
   // Position + scale, computed from geometry read live from the ref.
   const rawScale = useTransform(heroAmt, (a) =>
@@ -162,8 +185,14 @@ export function HeroLogo() {
     return () => window.removeEventListener("pointermove", onMove);
   }, [reduced, finePointer, px, py]);
 
-  const goTop = () => {
-    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  // Docked logo acts as "home": scroll to top on the landing route, otherwise
+  // navigate back to it.
+  const onLogoActivate = () => {
+    if (isHome) {
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+    } else {
+      router.push("/");
+    }
   };
 
   return (
@@ -185,15 +214,15 @@ export function HeroLogo() {
       <div
         ref={ref}
         role={isNav ? "link" : undefined}
-        aria-label={isNav ? "Coen — back to top" : undefined}
+        aria-label={isNav ? (isHome ? "Coen — back to top" : "Coen — home") : undefined}
         tabIndex={isNav ? 0 : -1}
-        onClick={isNav ? goTop : undefined}
+        onClick={isNav ? onLogoActivate : undefined}
         onKeyDown={
           isNav
             ? (e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  goTop();
+                  onLogoActivate();
                 }
               }
             : undefined

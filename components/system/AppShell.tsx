@@ -14,14 +14,16 @@ import { LightField } from "./LightField";
 import { HeroLogo } from "./HeroLogo";
 import { Nav } from "./Nav";
 import { Cursor } from "./Cursor";
+import { PageTransition } from "./PageTransition";
 
 /*
  * AppShell — the one client boundary that mounts every global system and holds
- * the shared providers. Everything that must persist across the single canvas
- * (background, light field, the morphing logo, nav, cursor) lives here, not in
- * page scenes, so nothing remounts as you move through the site.
+ * the shared providers. Everything that must persist across routes (background,
+ * light field, the morphing logo, nav, cursor) lives here, not in pages, so
+ * nothing remounts as you move through the site — that persistence is what lets
+ * page transitions feel continuous even though these are real routes.
  *
- * Server-rendered scene content is passed through as children.
+ * The routed page body is wrapped in PageTransition for the fluid handoff.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const cap = useMeasuredCapability();
@@ -54,7 +56,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <LightField />
           <HeroLogo />
           <Nav />
-          <main id="main">{children}</main>
+          <main id="main">
+            <PageTransition>{children}</PageTransition>
+          </main>
           <Cursor />
         </SmoothScroll>
       </LazyMotion>

@@ -7,7 +7,13 @@ import { SceneHeader } from "@/components/ui/SceneHeader";
  * spacing alone. Thoughts, not blog posts. Each entry softly fades + rises.
  * Server component.
  */
-export function Journal({ entries }: { entries: JournalEntry[] }) {
+export function Journal({
+  entries,
+  hideHeader = false,
+}: {
+  entries: JournalEntry[];
+  hideHeader?: boolean;
+}) {
   const sorted = [...entries].sort((a, b) => (a.date < b.date ? 1 : -1));
 
   const fmt = (iso: string) =>
@@ -20,12 +26,14 @@ export function Journal({ entries }: { entries: JournalEntry[] }) {
   return (
     <section id="journal" className="scene" aria-labelledby="journal-title">
       <div className="scene-inner">
-        <SceneHeader
-          index="04"
-          title="Journal"
-          id="journal-title"
-          lead="Notes to self, in the open."
-        />
+        {!hideHeader && (
+          <SceneHeader
+            index="04"
+            title="Journal"
+            id="journal-title"
+            lead="Notes to self, in the open."
+          />
+        )}
 
         <div style={{ maxWidth: 620 }}>
           {sorted.map((entry, i) => (

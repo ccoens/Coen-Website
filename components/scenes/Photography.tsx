@@ -24,7 +24,13 @@ const LAYOUT = [
   { justify: "flex-start", width: "clamp(220px, 38vw, 500px)", mt: "-9vh", speed: 0.2 },
 ] as const;
 
-export function Photography({ photos }: { photos: Photo[] }) {
+export function Photography({
+  photos,
+  hideHeader = false,
+}: {
+  photos: Photo[];
+  hideHeader?: boolean;
+}) {
   return (
     <section
       id="photography"
@@ -41,6 +47,7 @@ export function Photography({ photos }: { photos: Photo[] }) {
       }}
     >
       <div style={{ maxWidth: "var(--content-max)", margin: "0 auto" }}>
+        {!hideHeader && (
         <header style={{ marginBottom: "var(--space-6)" }}>
           <Reveal>
             <p
@@ -61,6 +68,7 @@ export function Photography({ photos }: { photos: Photo[] }) {
             </h2>
           </Reveal>
         </header>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
           {photos.map((photo, i) => {
