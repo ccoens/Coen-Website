@@ -32,22 +32,24 @@ export const projects: Project[] = [
   },
   {
     id: "project-two",
-    title: "FILL: Project Two",
-    year: "2024",
-    role: "Product & Prototyping",
+    title: "Software & Apps for everyone",
+    year: "2025",
+    role: "Product & Software",
     summary:
-      "FILL: what it is and why it mattered. Keep it human — what did people " +
-      "experience differently because this existed?",
+      "As a 2026 Swift Student Challenge winner, I believe that accessibility " +
+      "is simply good design. Guided by this motto, I strive to create apps " +
+      "that are inclusive, intuitive, and beneficial for everyone, regardless " +
+      "of ability or background.",
     href: undefined,
     cover: {
-      src: "/placeholders/project-2-cover.svg",
-      alt: "FILL: cover image for Project Two",
-      width: 1600,
-      height: 1000,
+      src: "/project2-header.jpg",
+      alt: "App design work by Coen",
+      width: 2048,
+      height: 1536,
     },
     gallery: [
-      { src: "/placeholders/project-2-a.svg", alt: "FILL: detail image", width: 1600, height: 1000 },
-      { src: "/placeholders/project-2-b.svg", alt: "FILL: detail image", width: 1600, height: 1000 },
+      { src: "/project2-2.jpg", alt: "App design and prototyping work", width: 5712, height: 4284 },
+      { src: "/project2-3.jpg", alt: "App design and prototyping work", width: 1600, height: 1200 },
     ],
   },
   {
