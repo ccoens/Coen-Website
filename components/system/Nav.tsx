@@ -33,6 +33,10 @@ export function Nav() {
   const { scrollY, velocity, scrollTo } = useScrollProgress();
   const isHome = pathname === "/";
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
+  // Which item the gliding pill currently sits under: the hovered one, or the
+  // active route when nothing is hovered.
+  const [hovered, setHovered] = useState<string | null>(null);
+  const target = hovered ?? pathname;
 
   // On home, reveal after ~60% of the first viewport; elsewhere, always shown.
   useMotionValueEvent(scrollY, "change", (y) => {
@@ -65,6 +69,7 @@ export function Nav() {
       <m.div style={{ opacity: velOpacity }}>
         <Glass as="div" variant="nav" radius="lg" blur={20}>
           <ul
+            onPointerLeave={() => setHovered(null)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -80,7 +85,9 @@ export function Nav() {
                   href={l.href}
                   label={l.label}
                   active={pathname === l.href}
+                  showPill={target === l.href}
                   reduced={reduced}
+                  onHover={() => setHovered(l.href)}
                 />
               </li>
             ))}
@@ -88,7 +95,9 @@ export function Nav() {
               <NavLink
                 label="Contact"
                 active={false}
+                showPill={target === "contact"}
                 reduced={reduced}
+                onHover={() => setHovered("contact")}
                 onClick={() => scrollTo("contact")}
               />
             </li>
@@ -103,73 +112,97 @@ function NavLink({
   href,
   label,
   active,
+  showPill,
   reduced,
+  onHover,
   onClick,
 }: {
   href?: string;
   label: string;
   active: boolean;
+  showPill: boolean;
   reduced: boolean;
+  onHover: () => void;
   onClick?: () => void;
 }) {
-  const [hover, setHover] = useState(false);
-  const lit = hover || active;
-
   const style = {
     position: "relative" as const,
     display: "inline-block",
     background: "transparent",
     border: "none",
-    padding: "8px 12px",
+    padding: "8px 14px",
     borderRadius: "999px",
     fontSize: "var(--fs-caption)",
     fontWeight: 500,
     letterSpacing: "0.01em",
-    color: lit ? "var(--text-primary)" : "var(--text-secondary)",
-    transition: "color 200ms var(--ease-primary)",
+    color: showPill || active ? "var(--text-primary)" : "var(--text-secondary)",
+    transition: "color 220ms var(--ease-primary)",
     whiteSpace: "nowrap" as const,
     textDecoration: "none",
     cursor: "pointer",
   };
 
-  const underline = (
+  // The gliding chip. Because only one item mounts it at a time and they share
+  // one layoutId, framer animates it smoothly between items. A hairline accent
+  // rule under the *active route* distinguishes "current page" from a hover.
+  const pill = showPill ? (
     <m.span
       aria-hidden
-      initial={false}
-      animate={{ scaleX: lit ? 1 : 0, opacity: lit ? 1 : 0 }}
-      transition={{ duration: reduced ? 0.12 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+      layoutId="nav-pill"
+      transition={
+        reduced
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 380, damping: 32, mass: 0.7 }
+      }
       style={{
         position: "absolute",
-        left: 12,
-        right: 12,
-        bottom: 4,
-        height: 1.5,
-        transformOrigin: "center",
-        background: "linear-gradient(90deg, transparent, var(--accent), transparent)",
+        inset: 0,
+        borderRadius: "999px",
+        background: "var(--accent-soft)",
+        border: "1px solid hsl(var(--accent-h) var(--accent-s) 60% / 0.28)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+        zIndex: 0,
       }}
-    />
-  );
+    >
+      {active && (
+        <span
+          style={{
+            position: "absolute",
+            left: "26%",
+            right: "26%",
+            bottom: 5,
+            height: 1.5,
+            borderRadius: 2,
+            background: "var(--accent)",
+          }}
+        />
+      )}
+    </m.span>
+  ) : null;
 
   const handlers = {
-    onPointerEnter: () => setHover(true),
-    onPointerLeave: () => setHover(false),
-    onFocus: () => setHover(true),
-    onBlur: () => setHover(false),
+    onPointerEnter: onHover,
+    onFocus: onHover,
   };
+
+  const inner = (
+    <>
+      {pill}
+      <span style={{ position: "relative", zIndex: 1 }}>{label}</span>
+    </>
+  );
 
   if (href) {
     return (
       <Link href={href} style={style} aria-current={active ? "page" : undefined} {...handlers}>
-        {label}
-        {underline}
+        {inner}
       </Link>
     );
   }
 
   return (
     <button type="button" onClick={onClick} style={style} {...handlers}>
-      {label}
-      {underline}
+      {inner}
     </button>
   );
 }
