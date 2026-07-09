@@ -3,10 +3,15 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { m, AnimatePresence, type Transition } from "framer-motion";
+import { m, AnimatePresence, useAnimationControls, type Transition } from "framer-motion";
 import type { Project } from "@/content/types";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useCapability } from "@/lib/capability";
+import { LockedCover } from "./LockedCover";
+
+// A short, damped left-right shake used to say "this won't open yet".
+const SHAKE = { x: [0, -8, 8, -7, 7, -4, 4, 0] };
+const SHAKE_TRANSITION: Transition = { duration: 0.45, ease: "easeInOut" };
 
 /*
  * ExhibitionPanel + ProjectExpansion (§13). Projects are glass exhibition
@@ -36,13 +41,26 @@ export function ExhibitionPanel({
   const reduced = useReducedMotion();
   const { canBlur, ready } = useCapability();
   const useBlur = ready && canBlur;
+  const locked = !!project.comingSoon;
+  const shake = useAnimationControls();
+
+  const handleClick = () => {
+    if (locked) {
+      // Refuse the open with a quick shake instead (unless reduced motion).
+      if (!reduced) shake.start({ ...SHAKE, transition: SHAKE_TRANSITION });
+      return;
+    }
+    onOpen(project.id);
+  };
 
   return (
     <m.button
       type="button"
-      onClick={() => onOpen(project.id)}
-      aria-label={`Open ${project.title}`}
-      whileHover={reduced ? undefined : { y: -10 }}
+      onClick={handleClick}
+      aria-label={locked ? `${project.title} — coming soon` : `Open ${project.title}`}
+      aria-disabled={locked}
+      whileHover={reduced || locked ? undefined : { y: -10 }}
+      animate={shake}
       transition={springLayout}
       style={{
         display: "block",
@@ -52,12 +70,13 @@ export function ExhibitionPanel({
         border: "none",
         background: "transparent",
         borderRadius: "var(--radius-lg)",
+        cursor: locked ? "not-allowed" : "pointer",
         // Hidden while its expansion is open so the shared layout isn't doubled.
         visibility: isActive ? "hidden" : "visible",
       }}
     >
       <m.div
-        layoutId={`panel-${project.id}`}
+        layoutId={locked ? undefined : `panel-${project.id}`}
         transition={springLayout}
         style={{
           position: "relative",
@@ -71,22 +90,26 @@ export function ExhibitionPanel({
         }}
       >
         <m.div
-          layoutId={`cover-${project.id}`}
-          data-cursor="image"
+          layoutId={locked ? undefined : `cover-${project.id}`}
+          data-cursor={locked ? undefined : "image"}
           style={{ position: "relative", aspectRatio: "16 / 10", overflow: "hidden" }}
         >
-          <Image
-            src={project.cover.src}
-            alt={project.cover.alt}
-            fill
-            sizes="(max-width: 900px) 100vw, 45vw"
-            style={{ objectFit: "cover" }}
-          />
+          {locked ? (
+            <LockedCover />
+          ) : (
+            <Image
+              src={project.cover.src}
+              alt={project.cover.alt}
+              fill
+              sizes="(max-width: 900px) 100vw, 45vw"
+              style={{ objectFit: "cover" }}
+            />
+          )}
         </m.div>
 
         <div style={{ padding: "var(--space-3)" }}>
           <m.h3
-            layoutId={`title-${project.id}`}
+            layoutId={locked ? undefined : `title-${project.id}`}
             className="type-h3"
             style={{
               marginBottom: "var(--space-1)",
@@ -98,7 +121,7 @@ export function ExhibitionPanel({
             {project.title}
           </m.h3>
           <p className="type-caption">
-            {project.year} · {project.role}
+            {locked ? "In the works" : `${project.year} · ${project.role}`}
           </p>
         </div>
       </m.div>

@@ -166,22 +166,42 @@ html.scroll-locked body {
   transform: scale(1.06);
   filter: saturate(1.08) brightness(1.03);
 }
+/* One-shot diagonal sweep. Using a keyframe animation (not a transition) means
+   it plays exactly once on hover-in and never reverse-sweeps on hover-out — the
+   earlier bug. It rests off-screen and invisible, so there's nothing to see
+   except the single pass. */
 .featured-sheen {
   position: absolute;
-  inset: 0;
+  inset: -1px;
   z-index: 2;
   pointer-events: none;
+  opacity: 0;
+  transform: translateX(-160%) skewX(-12deg);
   background: linear-gradient(
-    105deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.42) 50%,
-    transparent 65%
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
   );
-  transform: translateX(-130%);
-  transition: transform 900ms var(--ease-primary);
 }
 .featured-tile:hover .featured-sheen {
-  transform: translateX(130%);
+  animation: featured-sheen 0.85s var(--ease-primary) forwards;
+}
+@keyframes featured-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-160%) skewX(-12deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160%) skewX(-12deg);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .featured-tile:hover .featured-cover img {

@@ -54,41 +54,30 @@ export const projects: Project[] = [
   },
   {
     id: "project-three",
-    title: "FILL: Project Three",
-    year: "2024",
-    role: "Research & Interface",
-    summary:
-      "FILL: a sentence or two. If there's a link to a live thing or write-up, " +
-      "add it as `href` and the panel will surface it.",
-    href: undefined,
+    title: "Coming soon",
+    year: "",
+    role: "",
+    summary: "",
+    comingSoon: true,
     cover: {
       src: "/placeholders/project-3-cover.svg",
-      alt: "FILL: cover image for Project Three",
+      alt: "A locked, upcoming project",
       width: 1600,
       height: 1000,
     },
-    gallery: [
-      { src: "/placeholders/project-3-a.svg", alt: "FILL: detail image", width: 1200, height: 1500 },
-    ],
   },
   {
     id: "project-four",
-    title: "FILL: Project Four",
-    year: "2023",
-    role: "Concept & Build",
-    summary:
-      "FILL: closing project. Even a small experiment belongs here if it shows " +
-      "how you think.",
-    href: undefined,
+    title: "Coming soon",
+    year: "",
+    role: "",
+    summary: "",
+    comingSoon: true,
     cover: {
       src: "/placeholders/project-4-cover.svg",
-      alt: "FILL: cover image for Project Four",
+      alt: "A locked, upcoming project",
       width: 1600,
       height: 1000,
     },
-    gallery: [
-      { src: "/placeholders/project-4-a.svg", alt: "FILL: detail image", width: 1600, height: 1000 },
-      { src: "/placeholders/project-4-b.svg", alt: "FILL: detail image", width: 1600, height: 1000 },
-    ],
   },
 ];

@@ -22,13 +22,15 @@ export function Projects({
   hideHeader?: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const active = projects.find((p) => p.id === activeId) ?? null;
+  // Locked (coming-soon) projects never open, even via a hand-typed ?project= URL.
+  const active = projects.find((p) => p.id === activeId && !p.comingSoon) ?? null;
 
   // Restore from the URL on mount, and follow browser back/forward.
   useEffect(() => {
     const sync = () => {
       const id = new URLSearchParams(window.location.search).get("project");
-      setActiveId(id && projects.some((p) => p.id === id) ? id : null);
+      const openable = projects.some((p) => p.id === id && !p.comingSoon);
+      setActiveId(openable ? id : null);
     };
     sync();
     window.addEventListener("popstate", sync);

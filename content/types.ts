@@ -33,6 +33,8 @@ export interface Project {
   href?: string;
   cover: ProjectImage;
   gallery?: ProjectImage[];
+  /** Locked teaser — renders a "Coming soon" panel that shakes instead of opening. */
+  comingSoon?: boolean;
 }
 
 export interface Photo {
