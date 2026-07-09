@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Photography } from "@/components/scenes/Photography";
-import { Footer } from "@/components/scenes/Footer";
 import { photos } from "@/content/photos";
-import { profile } from "@/content/profile";
 
 export const metadata: Metadata = {
   title: "Photography — Coen",
@@ -27,7 +25,6 @@ export default function PhotographyPage() {
         Photography — Coen
       </h1>
       <Photography photos={photos} />
-      <Footer profile={profile} />
     </>
   );
 }

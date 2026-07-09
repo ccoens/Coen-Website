@@ -7,6 +7,7 @@ import { m, useMotionValueEvent, useTransform } from "framer-motion";
 import { Glass } from "@/components/ui/Glass";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { profile } from "@/content/profile";
 
 /*
  * Nav — the floating glass layer (§12), now route-aware. The top-left logo is
@@ -30,7 +31,7 @@ const LINKS = [
 export function Nav() {
   const reduced = useReducedMotion();
   const pathname = usePathname();
-  const { scrollY, velocity, scrollTo } = useScrollProgress();
+  const { scrollY, velocity } = useScrollProgress();
   const isHome = pathname === "/";
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
   // Which item the gliding pill currently sits under: the hovered one, or the
@@ -94,12 +95,12 @@ export function Nav() {
             ))}
             <li>
               <NavLink
+                href={`mailto:${profile.email}`}
                 label="Contact"
                 active={false}
                 showPill={target === "contact"}
                 reduced={reduced}
                 onHover={() => setHovered("contact")}
-                onClick={() => scrollTo("contact")}
               />
             </li>
           </ul>
@@ -194,6 +195,14 @@ function NavLink({
   );
 
   if (href) {
+    // mailto/external → plain anchor; internal route → Next Link (client nav).
+    if (/^(mailto:|https?:)/.test(href)) {
+      return (
+        <a href={href} style={style} {...handlers}>
+          {inner}
+        </a>
+      );
+    }
     return (
       <Link href={href} style={style} aria-current={active ? "page" : undefined} {...handlers}>
         {inner}
