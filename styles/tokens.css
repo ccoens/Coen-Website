@@ -97,8 +97,12 @@
   --z-blur-plane: -1;
   --z-glass: 1;
   --z-content: 2;
-  --z-cursor: 3;
   --z-nav: 40;
+  --z-overlay: 60; /* immersive project expansion */
+  /* The physics cursor is a DOM overlay and must paint above everything,
+     including the expansion dialog — the §6 "+3" is a conceptual depth, not a
+     stacking order. */
+  --z-cursor: 9999;
 
   /* ---- Motion: easing (§8) ------------------------------------------- */
   --ease-primary: cubic-bezier(0.22, 1, 0.36, 1);

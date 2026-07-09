@@ -146,10 +146,14 @@ export function ProjectExpansion({
           role="dialog"
           aria-modal="true"
           aria-label={project.title}
+          // Tell Lenis to leave the wheel alone inside the dialog so it scrolls
+          // natively — otherwise Lenis hijacks the wheel for the (locked) page
+          // and the expansion can't scroll.
+          data-lenis-prevent
           style={{
             position: "fixed",
             inset: 0,
-            zIndex: 60,
+            zIndex: "var(--z-overlay)" as unknown as number,
             display: "flex",
             justifyContent: "center",
             overflowY: "auto",
