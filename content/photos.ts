@@ -6,11 +6,8 @@ import type { Photo } from "./types";
  * the /placeholders/* files for real photographs in /public.
  */
 export const photos: Photo[] = [
-  { src: "/placeholders/photo-1.svg", alt: "FILL: photograph", width: 1600, height: 1067, place: "FILL: place" },
-  { src: "/placeholders/photo-2.svg", alt: "FILL: photograph", width: 1000, height: 1400, place: "FILL: place" },
-  { src: "/placeholders/photo-3.svg", alt: "FILL: photograph", width: 1600, height: 1067, place: "FILL: place" },
-  { src: "/placeholders/photo-4.svg", alt: "FILL: photograph", width: 1400, height: 1050, place: "FILL: place" },
-  { src: "/placeholders/photo-5.svg", alt: "FILL: photograph", width: 1000, height: 1400, place: "FILL: place" },
-  { src: "/placeholders/photo-6.svg", alt: "FILL: photograph", width: 1600, height: 900, place: "FILL: place" },
-  { src: "/placeholders/photo-7.svg", alt: "FILL: photograph", width: 1400, height: 1050, place: "FILL: place" },
+  { src: "/photos1.jpg", alt: "Photograph by Coen", width: 1200, height: 1600 },
+  { src: "/photos2.jpg", alt: "Photograph by Coen", width: 2268, height: 4032 },
+  { src: "/photos3.jpg", alt: "Photograph by Coen", width: 4032, height: 3024 },
+  { src: "/photos4.jpg", alt: "Photograph by Coen", width: 3648, height: 2736 },
 ];

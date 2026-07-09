@@ -67,12 +67,12 @@ export function About({
                 overflow: "hidden",
                 border: "1px solid var(--border)",
                 boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
-                aspectRatio: "4 / 5",
+                aspectRatio: "4 / 3",
               }}
             >
               <Image
-                src="/placeholders/about-portrait.svg"
-                alt="FILL: a portrait or working photograph of Coen"
+                src="/about.jpg"
+                alt="A photograph of Coen"
                 fill
                 sizes="(max-width: 900px) 100vw, 40vw"
                 style={{ objectFit: "cover" }}
