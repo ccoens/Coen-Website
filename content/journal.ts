@@ -7,27 +7,26 @@ import type { JournalEntry } from "./types";
 export const journal: JournalEntry[] = [
   {
     id: "entry-1",
-    title: "FILL: a short title",
-    date: "2026-06-18",
+    title: "Winning the Swift Student Challenge",
+    date: "2026-03-26",
     body:
-      "FILL: a paragraph of thinking. Something you noticed, changed your mind " +
-      "about, or want to remember. Write it the way you'd tell a friend, not the " +
-      "way you'd write a post.",
+      "I woke up at 6am to an email from Apple Developer Relations telling me I " +
+      "could check the status of my Swift Student Challenge submission. I had " +
+      "almost forgotten I entered, which is crazy considering the amount of time, " +
+      "effort, and stress I put into creating it. Winning was an incredibly " +
+      "powerful moment and a reminder that with determination, persistence, and " +
+      "belief in yourself, anything is possible.",
   },
   {
     id: "entry-2",
-    title: "FILL: another note",
-    date: "2026-04-02",
+    title: "Joining Snapchat",
+    date: "2025-05-02",
     body:
-      "FILL: a second thought. These are dated and stack newest-first, but they " +
-      "aren't announcements — they're a record of a mind at work.",
-  },
-  {
-    id: "entry-3",
-    title: "FILL: an older note",
-    date: "2026-01-27",
-    body:
-      "FILL: keep them sparse. A journal that breathes says more than one that's " +
-      "full. Replace this in content/journal.ts.",
+      "I woke up at 8am with my mother coming into my room to tell me I had been " +
+      "invited to join Snapchat's team for the next 18 months. It was a moment of " +
+      "incredible excitement, as I realised I would have the opportunity to work " +
+      "alongside industry leaders and help make a difference in people's " +
+      "experiences online. It was also the moment I discovered a deeper passion " +
+      "for creating safer, more positive digital spaces.",
   },
 ];
