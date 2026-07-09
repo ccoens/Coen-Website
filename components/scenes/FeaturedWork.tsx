@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Project } from "@/content/types";
 import { Reveal } from "@/components/ui/Reveal";
 import { Tilt } from "@/components/ui/Tilt";
+import { VelocitySkew } from "@/components/ui/VelocitySkew";
 
 /*
  * FeaturedWork — the landing's curated glimpse of the work (not the full grid).
@@ -41,7 +42,7 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
           </div>
         </Reveal>
 
-        <div
+        <VelocitySkew
           className="featured-grid"
           style={{ display: "grid", gap: "var(--space-4)", gridTemplateColumns: "minmax(0,1fr)" }}
         >
@@ -93,7 +94,7 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
               </Link>
             </Reveal>
           ))}
-        </div>
+        </VelocitySkew>
       </div>
     </section>
   );

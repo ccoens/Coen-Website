@@ -3,6 +3,7 @@
 import { m, useTransform } from "framer-motion";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { ShaderHero } from "@/components/system/ShaderHero";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
@@ -42,6 +43,10 @@ export function Hero({ statement }: { statement: string }) {
         justifyContent: "center",
       }}
     >
+      {/* Futuristic WebGL field behind the hero; self-gates and returns null on
+          low-capability/touch/reduced-motion, where the CSS mesh shows instead. */}
+      <ShaderHero />
+
       {/* Screen-reader H1: the visual COEN mark is decorative text in HeroLogo,
           so the accessible name of the page lives here. */}
       <h1

@@ -1,6 +1,7 @@
 import type { Profile } from "@/content/types";
 import { Reveal } from "@/components/ui/Reveal";
 import { SceneHeader } from "@/components/ui/SceneHeader";
+import { Magnetic } from "@/components/ui/Magnetic";
 
 /*
  * Footer / Contact scene (§13). Minimal — an invitation, the email, and links.
@@ -39,19 +40,21 @@ export function Footer({ profile }: { profile: Profile }) {
               </p>
             </Reveal>
             <Reveal delay={0.06}>
-              <a
-                href={`mailto:${profile.email}`}
-                data-cursor="interactive"
-                className="type-h3"
-                style={{
-                  color: "var(--accent)",
-                  textDecoration: "none",
-                  fontWeight: 500,
-                  wordBreak: "break-word",
-                }}
-              >
-                {profile.email}
-              </a>
+              <Magnetic strength={0.25}>
+                <a
+                  href={`mailto:${profile.email}`}
+                  data-cursor="interactive"
+                  className="type-h3"
+                  style={{
+                    color: "var(--accent)",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {profile.email}
+                </a>
+              </Magnetic>
             </Reveal>
           </div>
 
