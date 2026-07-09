@@ -52,6 +52,7 @@ export function Nav() {
   return (
     <m.nav
       aria-label="Primary"
+      data-cursor="hidden"
       initial={false}
       animate={{
         opacity: shown ? 1 : 0,

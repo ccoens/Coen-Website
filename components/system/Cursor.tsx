@@ -17,7 +17,7 @@ import { useCapability } from "@/lib/capability";
  * cursor stays. body[data-custom-cursor] (set in AppShell) hides the native one.
  */
 
-type CursorState = "default" | "interactive" | "image";
+type CursorState = "default" | "interactive" | "image" | "hidden";
 
 export function Cursor() {
   const { finePointer, reducedMotion, ready } = useCapability();
@@ -61,7 +61,8 @@ export function Cursor() {
 
       // Classify what's under the cursor for the state morph.
       const el = e.target as Element | null;
-      if (el?.closest('[data-cursor="image"], img')) setState("image");
+      if (el?.closest('[data-cursor="hidden"]')) setState("hidden");
+      else if (el?.closest('[data-cursor="image"], img')) setState("image");
       else if (el?.closest('a, button, [data-cursor="interactive"], input, textarea'))
         setState("interactive");
       else setState("default");
@@ -90,10 +91,13 @@ export function Cursor() {
 
   const baseSize = 20; // 18–24px
   const scale =
-    state === "image" ? 2.6 : state === "interactive" ? 1.8 : 1;
+    state === "hidden" ? 0.3 : state === "image" ? 2.6 : state === "interactive" ? 1.8 : 1;
   // Press compresses vertically 12% then springs back (§10).
   const pressY = pressed ? 0.88 : 1;
   const isLens = state === "image";
+  // Over "hidden" zones (e.g. the nav) the orb fades out so it never collides
+  // with those surfaces' own hover feedback (the nav pill).
+  const orbOpacity = state === "hidden" ? 0 : 1;
 
   return (
     <m.div
@@ -122,7 +126,7 @@ export function Cursor() {
         animate={{
           scale: scale,
           scaleY: pressY,
-          opacity: 1,
+          opacity: orbOpacity,
         }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
         style={{
