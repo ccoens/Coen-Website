@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AppShell } from "@/components/system/AppShell";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <AppShell>{children}</AppShell>
+        <Analytics />
       </body>
     </html>
   );
