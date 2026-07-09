@@ -47,7 +47,7 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
         </Reveal>
 
         <VelocitySkew
-          className="featured-grid"
+          className={`featured-grid featured-grid--${featured.length}`}
           style={{ display: "grid", gap: "var(--space-4)", gridTemplateColumns: "minmax(0,1fr)" }}
         >
           {featured.map((p, i) => (
