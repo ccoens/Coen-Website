@@ -25,7 +25,7 @@ export const profile: Profile = {
     { label: "Travelling", value: "FILL: where, or “home for now”" },
   ],
 
-  email: "FILL: hello@coen.life",
+  email: "coenhatcherross@gmail.com",
 
   socials: [
     { label: "FILL: X", href: "#fill-x" },

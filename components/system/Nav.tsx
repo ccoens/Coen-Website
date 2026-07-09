@@ -7,7 +7,7 @@ import { m, useMotionValueEvent, useTransform } from "framer-motion";
 import { Glass } from "@/components/ui/Glass";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
-import { profile } from "@/content/profile";
+import { useContact } from "./Contact";
 
 /*
  * Nav — the floating glass layer (§12), now route-aware. The top-left logo is
@@ -31,6 +31,7 @@ const LINKS = [
 export function Nav() {
   const reduced = useReducedMotion();
   const pathname = usePathname();
+  const { open: openContact } = useContact();
   const { scrollY, velocity } = useScrollProgress();
   const isHome = pathname === "/";
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
@@ -95,12 +96,12 @@ export function Nav() {
             ))}
             <li>
               <NavLink
-                href={`mailto:${profile.email}`}
                 label="Contact"
                 active={false}
                 showPill={target === "contact"}
                 reduced={reduced}
                 onHover={() => setHovered("contact")}
+                onClick={openContact}
               />
             </li>
           </ul>

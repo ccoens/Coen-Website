@@ -15,6 +15,7 @@ import { HeroLogo } from "./HeroLogo";
 import { Nav } from "./Nav";
 import { Cursor } from "./Cursor";
 import { PageTransition } from "./PageTransition";
+import { ContactProvider } from "./Contact";
 
 /*
  * AppShell — the one client boundary that mounts every global system and holds
@@ -52,14 +53,16 @@ export function AppShell({ children }: { children: ReactNode }) {
       */}
       <LazyMotion features={domMax} strict>
         <SmoothScroll>
-          <Background />
-          <LightField />
-          <HeroLogo />
-          <Nav />
-          <main id="main">
-            <PageTransition>{children}</PageTransition>
-          </main>
-          <Cursor />
+          <ContactProvider>
+            <Background />
+            <LightField />
+            <HeroLogo />
+            <Nav />
+            <main id="main">
+              <PageTransition>{children}</PageTransition>
+            </main>
+            <Cursor />
+          </ContactProvider>
         </SmoothScroll>
       </LazyMotion>
     </CapabilityContext.Provider>
