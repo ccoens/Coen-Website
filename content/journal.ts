@@ -6,6 +6,17 @@ import type { JournalEntry } from "./types";
  */
 export const journal: JournalEntry[] = [
   {
+    id: "entry-3",
+    title: "Spending my birthday with Apple",
+    date: "2026-07-02",
+    body:
+      "Today was my birthday, and I was incredibly lucky to spend it in Sydney " +
+      "attending a conference with Apple. I had the opportunity to meet inspiring " +
+      "people, learn from some of the best in the industry, and celebrate in a way " +
+      "I never expected. It was a truly memorable experience and a reminder of how " +
+      "fortunate I am to be surrounded by opportunities to learn and grow.",
+  },
+  {
     id: "entry-1",
     title: "Winning the Swift Student Challenge",
     date: "2026-03-26",
