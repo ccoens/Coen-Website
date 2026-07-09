@@ -65,7 +65,10 @@ export function Nav() {
       style={{
         position: "fixed",
         top: 18,
-        right: "var(--nav-margin, 20px)",
+        // Centred horizontally. `x` is a motion transform component so it
+        // composes cleanly with the animated `y` above (no raw transform clash).
+        left: "50%",
+        x: "-50%",
         zIndex: "var(--z-nav)" as unknown as number,
       }}
     >

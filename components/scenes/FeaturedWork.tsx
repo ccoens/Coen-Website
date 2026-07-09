@@ -12,7 +12,9 @@ import { FeaturedTile } from "./FeaturedTile";
  * Tilt leaves are client and degrade to static on touch/reduced-motion.
  */
 export function FeaturedWork({ projects }: { projects: Project[] }) {
-  const featured = projects.slice(0, 3);
+  // Only real, openable projects are featured on the landing — locked
+  // "Coming soon" teasers live on the /projects page, not here.
+  const featured = projects.filter((p) => !p.comingSoon).slice(0, 3);
 
   return (
     <section aria-labelledby="featured-title" className="scene">
