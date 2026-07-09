@@ -88,7 +88,12 @@ export function ExhibitionPanel({
           <m.h3
             layoutId={`title-${project.id}`}
             className="type-h3"
-            style={{ marginBottom: "var(--space-1)" }}
+            style={{
+              marginBottom: "var(--space-1)",
+              // Reserve two lines so panels with a one- or two-line title share
+              // the same height and the grid rows stay flush.
+              minHeight: "calc(2 * var(--lh-h3) * 1em)",
+            }}
           >
             {project.title}
           </m.h3>
