@@ -78,8 +78,13 @@ export function Hero({ statement }: { statement: string }) {
           paddingInline: "var(--margin-mobile)",
         }}
       >
-        <p
+        {/* First-load composition: the hero content assembles in a considered
+            stagger (blur + rise), a touch more expressive; instant if reduced. */}
+        <m.p
           className="type-h3"
+          initial={reduced ? false : { opacity: 0, y: 26, filter: "blur(8px)" }}
+          animate={reduced ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
           style={{
             maxWidth: "24ch",
             color: "var(--text-secondary)",
@@ -87,16 +92,22 @@ export function Hero({ statement }: { statement: string }) {
           }}
         >
           {statement}
-        </p>
+        </m.p>
 
-        <Magnetic strength={0.4}>
-          <GlassButton onClick={() => scrollTo("work")}>
-            See the work
-            <span aria-hidden style={{ opacity: 0.5 }}>
-              ↓
-            </span>
-          </GlassButton>
-        </Magnetic>
+        <m.div
+          initial={reduced ? false : { opacity: 0, y: 16 }}
+          animate={reduced ? undefined : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.42 }}
+        >
+          <Magnetic strength={0.4}>
+            <GlassButton onClick={() => scrollTo("work")}>
+              See the work
+              <span aria-hidden style={{ opacity: 0.5 }}>
+                ↓
+              </span>
+            </GlassButton>
+          </Magnetic>
+        </m.div>
       </m.div>
     </section>
   );

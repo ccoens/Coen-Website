@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useCapability } from "@/lib/capability";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { canberraNow } from "@/lib/time";
 
 /*
  * ShaderHero — the futuristic landing hero (raw WebGL, no 3D library, so it adds
@@ -28,6 +29,7 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform vec2 uMouse;   // normalised 0..1, y-down
 uniform float uHue;    // degrees
+uniform float uDaylight; // 0 = Canberra deep night, 1 = midday
 
 float hash(vec2 p){ p = fract(p*vec2(123.34,345.45)); p += dot(p, p+34.345); return fract(p.x*p.y); }
 float noise(vec2 p){
@@ -63,16 +65,20 @@ void main(){
                 fbm(p + 3.5*q + vec2(8.3,2.8) - 0.12*t));
   float f = fbm(p + 3.0*r);
 
-  // Pale palette: warm off-white base, two low-sat accent washes.
-  vec3 base = vec3(0.968, 0.968, 0.961);
-  vec3 c1 = hsl2rgb(uHue,        0.34, 0.90);
-  vec3 c2 = hsl2rgb(uHue + 42.0, 0.30, 0.88);
+  // Palette shifts with Canberra's time of day: warmer + lighter by day, cooler
+  // + a touch deeper and more present at night. Subtle — it reads as mood.
+  float hueShift = mix(26.0, -24.0, uDaylight);  // night → cool, day → warm
+  float sat = mix(0.42, 0.30, uDaylight);        // night slightly more saturated
+  float lite = mix(0.86, 0.92, uDaylight);       // night slightly deeper
+  vec3 base = mix(vec3(0.945,0.951,0.965), vec3(0.972,0.968,0.958), uDaylight);
+  vec3 c1 = hsl2rgb(uHue + hueShift,        sat,      lite);
+  vec3 c2 = hsl2rgb(uHue + hueShift + 42.0, sat*0.9,  lite - 0.02);
   vec3 col = base;
-  col = mix(col, c1, clamp(f*f*1.4, 0.0, 1.0));
-  col = mix(col, c2, clamp(length(r)*0.5, 0.0, 0.55));
+  col = mix(col, c1, clamp(f*f*mix(1.7,1.3,uDaylight), 0.0, 1.0));
+  col = mix(col, c2, clamp(length(r)*0.5, 0.0, 0.6));
 
   // Soft light lift near the cursor.
-  col += hsl2rgb(uHue, 0.4, 0.7) * exp(-md*2.6) * 0.12;
+  col += hsl2rgb(uHue + hueShift, 0.4, 0.7) * exp(-md*2.6) * 0.13;
 
   // Gentle vignette so edges settle into the page.
   float vig = smoothstep(1.25, 0.35, length(uv-0.5));
@@ -133,6 +139,7 @@ export function ShaderHero() {
     const uTime = gl.getUniformLocation(prog, "uTime");
     const uMouse = gl.getUniformLocation(prog, "uMouse");
     const uHue = gl.getUniformLocation(prog, "uHue");
+    const uDaylight = gl.getUniformLocation(prog, "uDaylight");
 
     // Cap DPR — this is a soft background, not crisp UI.
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -160,12 +167,14 @@ export function ShaderHero() {
     window.addEventListener("pointermove", onMove, { passive: true });
 
     let hue = 232;
-    const sampleHue = () => {
+    let daylight = 0.6;
+    const sample = () => {
       const v = getComputedStyle(document.documentElement).getPropertyValue("--accent-h");
       const n = parseFloat(v);
       if (!Number.isNaN(n)) hue = n;
+      daylight = canberraNow().daylight;
     };
-    sampleHue();
+    sample();
 
     // Pause when the hero is off-screen (it only covers the first viewport).
     let onScreen = true;
@@ -186,7 +195,7 @@ export function ShaderHero() {
         raf = 0;
         return; // IO / visibility change will restart it
       }
-      if (frame % 90 === 0) sampleHue();
+      if (frame % 90 === 0) sample();
       frame++;
       // Ease the cursor influence.
       mx += (tmx - mx) * 0.06;
@@ -196,6 +205,7 @@ export function ShaderHero() {
       gl.uniform1f(uTime, (now - start) / 1000);
       gl.uniform2f(uMouse, mx, 1 - my); // flip to gl y-up
       gl.uniform1f(uHue, hue);
+      gl.uniform1f(uDaylight, daylight);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(loop);
     };

@@ -14,6 +14,7 @@ import { LightField } from "./LightField";
 import { HeroLogo } from "./HeroLogo";
 import { Nav } from "./Nav";
 import { Cursor } from "./Cursor";
+import { LocalClock } from "./LocalClock";
 import { PageTransition } from "./PageTransition";
 
 /*
@@ -56,6 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <LightField />
           <HeroLogo />
           <Nav />
+          <LocalClock />
           <main id="main">
             <PageTransition>{children}</PageTransition>
           </main>

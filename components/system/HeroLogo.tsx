@@ -197,6 +197,10 @@ export function HeroLogo() {
 
   return (
     <m.div
+      // One-time fade-in on load — part of the "composed" landing entrance.
+      initial={reduced ? false : { opacity: 0 }}
+      animate={reduced ? undefined : { opacity: 1 }}
+      transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
       style={{
         position: "fixed",
         top: 0,

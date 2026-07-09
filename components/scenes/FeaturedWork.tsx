@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Project } from "@/content/types";
 import { Reveal } from "@/components/ui/Reveal";
 import { Tilt } from "@/components/ui/Tilt";
+import { Float } from "@/components/ui/Float";
 import { VelocitySkew } from "@/components/ui/VelocitySkew";
 
 /*
@@ -53,44 +54,46 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
                 aria-label={`${p.title} — see in projects`}
                 style={{ textDecoration: "none", color: "inherit", display: "block" }}
               >
-                <Tilt
-                  max={7}
-                  className="featured-tile"
-                  style={{
-                    position: "relative",
-                    borderRadius: "var(--radius-lg)",
-                    overflow: "hidden",
-                    border: "1px solid var(--border)",
-                    boxShadow: "0 18px 60px rgba(0,0,0,0.09)",
-                    background: "var(--surface-solid)",
-                  }}
-                >
-                  <div
-                    data-cursor="image"
+                <Float phase={i * 0.34} amplitude={7} duration={6 + i * 0.8}>
+                  <Tilt
+                    max={7}
+                    className="featured-tile"
                     style={{
                       position: "relative",
-                      aspectRatio: "4 / 3",
+                      borderRadius: "var(--radius-lg)",
                       overflow: "hidden",
-                      transform: "translateZ(30px)",
+                      border: "1px solid var(--border)",
+                      boxShadow: "0 18px 60px rgba(0,0,0,0.09)",
+                      background: "var(--surface-solid)",
                     }}
                   >
-                    <Image
-                      src={p.cover.src}
-                      alt={p.cover.alt}
-                      fill
-                      sizes="(max-width: 900px) 100vw, 33vw"
-                      style={{ objectFit: "cover" }}
-                    />
-                  </div>
-                  <div style={{ padding: "var(--space-3)", transform: "translateZ(45px)" }}>
-                    <h3 className="type-h3" style={{ fontSize: "clamp(20px, 2vw, 26px)" }}>
-                      {p.title}
-                    </h3>
-                    <p className="type-caption" style={{ marginTop: "var(--space-1)" }}>
-                      {p.year} · {p.role}
-                    </p>
-                  </div>
-                </Tilt>
+                    <div
+                      data-cursor="image"
+                      style={{
+                        position: "relative",
+                        aspectRatio: "4 / 3",
+                        overflow: "hidden",
+                        transform: "translateZ(30px)",
+                      }}
+                    >
+                      <Image
+                        src={p.cover.src}
+                        alt={p.cover.alt}
+                        fill
+                        sizes="(max-width: 900px) 100vw, 33vw"
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    <div style={{ padding: "var(--space-3)", transform: "translateZ(45px)" }}>
+                      <h3 className="type-h3" style={{ fontSize: "clamp(20px, 2vw, 26px)" }}>
+                        {p.title}
+                      </h3>
+                      <p className="type-caption" style={{ marginTop: "var(--space-1)" }}>
+                        {p.year} · {p.role}
+                      </p>
+                    </div>
+                  </Tilt>
+                </Float>
               </Link>
             </Reveal>
           ))}
