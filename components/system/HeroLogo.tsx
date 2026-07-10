@@ -290,6 +290,7 @@ export function HeroLogo() {
             px={px}
             py={py}
             enabled={!reduced && finePointer}
+            grabbable={!reduced && finePointer && !isNav}
           />
         ))}
       </div>
@@ -305,6 +306,7 @@ function HeroLetter({
   px,
   py,
   enabled,
+  grabbable,
 }: {
   char: string;
   depth: number;
@@ -312,6 +314,7 @@ function HeroLetter({
   px: ReturnType<typeof useMotionValue<number>>;
   py: ReturnType<typeof useMotionValue<number>>;
   enabled: boolean;
+  grabbable: boolean;
 }) {
   // Offset = pointer × depth × how-hero-we-still-are. Multiplied through so the
   // parallax is present in the hero and gone in the nav.
@@ -333,11 +336,32 @@ function HeroLetter({
   const sx = useSpring(lx, springCfg);
   const sy = useSpring(ly, springCfg);
 
+  // Soft-body layer: the outer span carries the parallax; the inner span is
+  // grabbable. `dragSnapToOrigin` + a bouncy dragTransition means a flung letter
+  // wobbles back to place like it's on elastic — a name you can physically
+  // throw. Only live in the hero (grabbable=false once docked as the nav logo,
+  // so it stays a clean clickable link). pointerEvents is re-enabled here even
+  // though the hero overlay is inert, so only the glyphs themselves catch drags.
   return (
     <m.span
       style={{ display: "inline-block", x: sx, y: sy, willChange: "transform" }}
     >
-      {char}
+      <m.span
+        drag={grabbable}
+        dragSnapToOrigin
+        dragElastic={0.85}
+        dragMomentum={false}
+        dragTransition={{ bounceStiffness: 180, bounceDamping: 11 }}
+        whileDrag={{ scale: 1.12 }}
+        style={{
+          display: "inline-block",
+          cursor: grabbable ? "grab" : "inherit",
+          pointerEvents: grabbable ? "auto" : "none",
+          touchAction: grabbable ? "none" : "auto",
+        }}
+      >
+        {char}
+      </m.span>
     </m.span>
   );
 }

@@ -21,7 +21,6 @@ export function FooterSigil() {
         alignItems: "center",
         gap: 14,
         minHeight: 56,
-        marginTop: "var(--space-6)",
       }}
     >
       {id && <Sigil seed={id.seed} size={56} />}

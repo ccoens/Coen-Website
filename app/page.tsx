@@ -3,6 +3,7 @@ import { CanberraTime } from "@/components/scenes/CanberraTime";
 import { FeaturedWork } from "@/components/scenes/FeaturedWork";
 import { AboutGlimpse } from "@/components/scenes/AboutGlimpse";
 import { Current } from "@/components/scenes/Current";
+import { FooterSigil } from "@/components/system/FooterSigil";
 
 import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
@@ -22,6 +23,28 @@ export default function Home() {
       </div>
       <AboutGlimpse profile={profile} />
       <Current profile={profile} />
+      <footer
+        className="scene-inner"
+        style={{ paddingTop: "var(--space-6)", paddingBottom: "var(--space-9)" }}
+      >
+        <div
+          style={{
+            borderTop: "1px solid var(--border)",
+            paddingTop: "var(--space-4)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            flexWrap: "wrap",
+            gap: "var(--space-4)",
+          }}
+        >
+          <p className="type-caption">
+            © {new Date().getFullYear()} Coen · coen.life · Built as a continuous
+            spatial interface.
+          </p>
+          <FooterSigil />
+        </div>
+      </footer>
     </>
   );
 }
