@@ -8,12 +8,16 @@ import {
 } from "@/lib/capability";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useAccent } from "@/lib/accent";
+import { useSky } from "@/lib/sky";
 import { SmoothScroll } from "./SmoothScroll";
 import { Background } from "./Background";
+import { SkyWash } from "./SkyWash";
 import { LightField } from "./LightField";
 import { HeroLogo } from "./HeroLogo";
 import { Nav } from "./Nav";
 import { Cursor } from "./Cursor";
+import { Screensaver } from "./Screensaver";
+import { VisitorSignal } from "./VisitorSignal";
 import { PageTransition } from "./PageTransition";
 import { ContactProvider } from "./Contact";
 
@@ -32,6 +36,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   // Seed + (optionally) drift the accent hue.
   useAccent(reduced);
+  // Publish the visitor's real local sky (timezone + solar geometry) to CSS.
+  useSky();
 
   // Hide the native cursor only when we're actually mounting the physics orb.
   useEffect(() => {
@@ -55,6 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SmoothScroll>
           <ContactProvider>
             <Background />
+            <SkyWash />
             <LightField />
             <HeroLogo />
             <Nav />
@@ -62,6 +69,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <PageTransition>{children}</PageTransition>
             </main>
             <Cursor />
+            <Screensaver />
+            <VisitorSignal />
           </ContactProvider>
         </SmoothScroll>
       </LazyMotion>

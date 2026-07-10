@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useCapability } from "@/lib/capability";
 import { useReducedMotion } from "@/lib/useReducedMotion";
-import { canberraNow } from "@/lib/time";
+import { visitorSky } from "@/lib/sky";
 
 /*
  * ShaderHero — the futuristic landing hero (raw WebGL, no 3D library, so it adds
@@ -29,8 +29,9 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform vec2 uMouse;   // normalised 0..1, y-down
 uniform float uHue;    // degrees
-uniform float uDaylight; // 0 = Canberra deep night, 1 = midday
+uniform float uDaylight; // 0 = visitor's deep night, 1 = high sun
 uniform float uEnergy;   // 0 = idle/settled, 1 = fully awake (recent movement)
+uniform float uGold;   // 0..1 golden-hour warmth
 
 float hash(vec2 p){ p = fract(p*vec2(123.34,345.45)); p += dot(p, p+34.345); return fract(p.x*p.y); }
 float noise(vec2 p){
@@ -81,6 +82,9 @@ void main(){
 
   // Soft light lift near the cursor — brightest when awake, gone when idle.
   col += hsl2rgb(uHue + hueShift, 0.4, 0.7) * exp(-md*2.6) * 0.13 * uEnergy;
+
+  // Golden-hour warmth: a faint amber breath when the visitor's sun is low.
+  col += hsl2rgb(34.0, 0.55, 0.68) * uGold * (0.05 + 0.05*f);
 
   // Gentle vignette so edges settle into the page.
   float vig = smoothstep(1.25, 0.35, length(uv-0.5));
@@ -147,6 +151,7 @@ export function ShaderHero() {
     const uHue = gl.getUniformLocation(prog, "uHue");
     const uDaylight = gl.getUniformLocation(prog, "uDaylight");
     const uEnergy = gl.getUniformLocation(prog, "uEnergy");
+    const uGold = gl.getUniformLocation(prog, "uGold");
 
     // Cap DPR — this is a soft background, not crisp UI.
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -180,11 +185,15 @@ export function ShaderHero() {
 
     let hue = 232;
     let daylight = 0.6;
+    let gold = 0;
     const sample = () => {
       const v = getComputedStyle(document.documentElement).getPropertyValue("--accent-h");
       const n = parseFloat(v);
       if (!Number.isNaN(n)) hue = n;
-      daylight = canberraNow().daylight;
+      // The hero now breathes with the VISITOR's real local sky, not Canberra.
+      const sky = visitorSky();
+      daylight = sky.daylight;
+      gold = sky.gold;
     };
     sample();
 
@@ -232,6 +241,7 @@ export function ShaderHero() {
       gl.uniform1f(uHue, hue);
       gl.uniform1f(uDaylight, daylight);
       gl.uniform1f(uEnergy, energy);
+      gl.uniform1f(uGold, gold);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(loop);
     };
