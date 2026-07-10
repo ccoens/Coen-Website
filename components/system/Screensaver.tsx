@@ -74,8 +74,21 @@ export function Screensaver() {
       tw: Math.random() * Math.PI * 2,
     }));
 
+    interface Meteor {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+      max: number;
+    }
+    const meteors: Meteor[] = [];
+    let lastT = 0;
+
     let raf = 0;
     const loop = (t: number) => {
+      const dt = lastT ? Math.min(t - lastT, 60) : 16;
+      lastT = t;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (const s of stars) {
         s.x += s.vx * 0.001;
@@ -89,6 +102,41 @@ export function Screensaver() {
         ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r * dpr, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${hue}, 55%, 78%, ${0.25 + tw * 0.5})`;
         ctx.fill();
+      }
+
+      // Shooting stars streak diagonally across the field now and then.
+      if (meteors.length < 2 && Math.random() < dt * 0.0012) {
+        const speed = (canvas.width * 0.9) / 900; // cross in ~0.9s (px/ms)
+        const ang = Math.PI * (0.15 + Math.random() * 0.2); // shallow downward
+        meteors.push({
+          x: Math.random() * canvas.width * 0.6,
+          y: Math.random() * canvas.height * 0.4,
+          vx: Math.cos(ang) * speed,
+          vy: Math.sin(ang) * speed,
+          life: 0,
+          max: 1100,
+        });
+      }
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        m.x += m.vx * dt;
+        m.y += m.vy * dt;
+        m.life += dt;
+        const k = Math.max(0, 1 - m.life / m.max);
+        const tailX = m.x - m.vx * 120;
+        const tailY = m.y - m.vy * 120;
+        const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+        grad.addColorStop(0, `hsla(210, 70%, 92%, ${0.85 * k})`);
+        grad.addColorStop(1, "hsla(210, 70%, 92%, 0)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.6 * dpr;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.stroke();
+        if (m.life > m.max || m.x > canvas.width + 200 || m.y > canvas.height + 200)
+          meteors.splice(i, 1);
       }
       raf = requestAnimationFrame(loop);
     };

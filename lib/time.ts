@@ -50,20 +50,34 @@ export function canberraNow(date: Date = new Date()): CanberraNow {
   return { hh, mm, ss, hour: hourNum, partOfDay, daylight };
 }
 
+// Coen's real sleep window in Canberra time: to bed at 11:00 PM, up at 7:15 AM.
+export const BEDTIME = 23; // 11:00 PM
+export const WAKE = 7.25; // 7:15 AM
+
+/** True when it's within Coen's sleeping hours in Canberra. */
+export function coenAsleep(now: CanberraNow = canberraNow()): boolean {
+  return now.hour >= BEDTIME || now.hour < WAKE;
+}
+
 /*
  * A single human, context-aware line about where the day is at in Canberra —
- * the site narrating Coen's real time, not a generic label. Purely a function of
- * the local hour, so it changes through the day and reads as quiet awareness.
+ * the site narrating Coen's real time, not a generic label. It knows Coen's
+ * actual sleep schedule (11pm→7:15am), so at night it says he's asleep, and it
+ * reads as quiet awareness of where he really is in his day.
  */
 export function canberraStatus(now: CanberraNow = canberraNow()): string {
   const h = now.hour;
-  if (h < 5) return "The middle of the night in Canberra — Coen is asleep.";
-  if (h < 7) return "First light in Canberra — the city is still waking.";
-  if (h < 9) return "Morning in Canberra — Coen is likely just getting started.";
+  // Asleep: 11pm → 7:15am.
+  if (h >= BEDTIME) return "Just gone 11 in Canberra — Coen has turned in for the night.";
+  if (h < 2) return "The middle of the night in Canberra — Coen is fast asleep.";
+  if (h < 6) return "Deep night in Canberra — Coen is asleep.";
+  if (h < WAKE) return "Almost dawn in Canberra — Coen is still asleep, up at 7:15.";
+  // Awake.
+  if (h < 8) return "Just past 7:15 in Canberra — Coen is waking up.";
+  if (h < 9) return "Early morning in Canberra — Coen is easing into the day.";
   if (h < 12) return "Mid-morning in Canberra — probably deep in a project.";
   if (h < 14) return "Midday in Canberra.";
   if (h < 17) return "Afternoon in Canberra — heads-down in the work.";
   if (h < 20) return "Evening in Canberra — winding down the day.";
-  if (h < 23) return "Night in Canberra — Coen is probably reading or building.";
-  return "Late night in Canberra — the city is quiet.";
+  return "Night in Canberra — Coen is probably reading or building before bed.";
 }

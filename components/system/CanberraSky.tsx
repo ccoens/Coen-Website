@@ -35,7 +35,21 @@ export function CanberraSky({ size = 60 }: { size?: number }) {
     compute();
     const recompute = window.setInterval(compute, 60_000);
 
+    // Shooting stars: rare meteors that streak across the dome at night.
+    interface Meteor {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+      max: number;
+    }
+    const meteors: Meteor[] = [];
+    let lastT = 0;
+
     const draw = (t: number) => {
+      const dt = lastT ? Math.min(t - lastT, 60) : 16;
+      lastT = t;
       const daylight = canberraNow().daylight;
       const vis = Math.max(0.12, 1 - daylight); // fade with Canberra's darkness
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -49,6 +63,12 @@ export function CanberraSky({ size = 60 }: { size?: number }) {
       ctx.strokeStyle = `hsla(220, 30%, 60%, ${0.28 * vis})`;
       ctx.stroke();
 
+      // Keep stars + meteors inside the dome.
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(C, C, R, 0, Math.PI * 2);
+      ctx.clip();
+
       for (const s of dome.current) {
         const bright = Math.max(0.2, 1.25 - (s.mag + 1.5) / 5);
         const rr = Math.max(0.6 * dpr, (0.5 + (2 - Math.min(s.mag, 2)) * 0.55) * dpr);
@@ -58,6 +78,46 @@ export function CanberraSky({ size = 60 }: { size?: number }) {
         ctx.fillStyle = `hsla(210, 62%, 88%, ${Math.min(1, bright * vis * tw)})`;
         ctx.fill();
       }
+
+      // Spawn + advance meteors (night only, motion allowed).
+      if (!reduced && vis > 0.45) {
+        if (meteors.length === 0 && Math.random() < dt * 0.0009) {
+          const a = Math.random() * Math.PI * 2;
+          const speed = (R * 1.6) / 700; // cross the disc in ~0.7s (px/ms)
+          const dir = a + Math.PI + (Math.random() - 0.5); // roughly across
+          meteors.push({
+            x: C + Math.cos(a) * R * 0.85,
+            y: C + Math.sin(a) * R * 0.85,
+            vx: Math.cos(dir) * speed,
+            vy: Math.sin(dir) * speed,
+            life: 0,
+            max: 700,
+          });
+        }
+      }
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        m.x += m.vx * dt;
+        m.y += m.vy * dt;
+        m.life += dt;
+        const k = 1 - m.life / m.max; // fade out
+        const tailX = m.x - m.vx * 90;
+        const tailY = m.y - m.vy * 90;
+        const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+        grad.addColorStop(0, `hsla(205, 80%, 92%, ${0.9 * k * vis})`);
+        grad.addColorStop(1, "hsla(205, 80%, 92%, 0)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4 * dpr;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.stroke();
+        const dist = Math.hypot(m.x - C, m.y - C);
+        if (m.life > m.max || dist > R * 1.1) meteors.splice(i, 1);
+      }
+
+      ctx.restore();
     };
 
     let raf = 0;

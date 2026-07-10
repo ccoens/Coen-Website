@@ -5,6 +5,7 @@ import { m } from "framer-motion";
 import { canberraNow, canberraStatus } from "@/lib/time";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { CanberraSky } from "@/components/system/CanberraSky";
+import { Connection } from "@/components/scenes/Connection";
 
 /*
  * CanberraTime — the first beat after the hero: a large, live "Time in Canberra"
@@ -123,6 +124,9 @@ export function CanberraTime() {
         >
           {mounted ? canberraStatus(now) : " "}
         </p>
+
+        {/* The "you and Coen" beat: localized hello, distance + compass, shared sky. */}
+        <Connection />
       </m.div>
     </section>
   );

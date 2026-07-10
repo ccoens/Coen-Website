@@ -122,6 +122,32 @@ export interface Sky {
   label: string;
 }
 
+export interface VisitorLocation {
+  /** Representative latitude, or null when the timezone isn't in the table. */
+  lat: number | null;
+  /** Longitude (from the table, or derived from the UTC offset). */
+  lng: number;
+  /** true when we have a real lat/lng (so distance is meaningful). */
+  known: boolean;
+}
+
+/** Resolve the visitor's rough location from their IANA timezone. */
+export function visitorLocation(date: Date = new Date()): VisitorLocation {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const coords = TZ_COORDS[tz];
+    if (coords) return { lat: coords[0], lng: coords[1], known: true };
+    return { lat: null, lng: (-date.getTimezoneOffset() / 60) * 15, known: false };
+  } catch {
+    return { lat: null, lng: 0, known: false };
+  }
+}
+
+/** Public sun elevation in degrees for any lat/lng at a moment. */
+export function sunElevation(date: Date, lat: number, lng: number): number {
+  return solarElevation(date, lat, lng).elev;
+}
+
 /** Sun elevation for a lat/lng at a moment (simplified, EoT-free). */
 function solarElevation(date: Date, lat: number, lng: number) {
   const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
@@ -140,19 +166,7 @@ function solarElevation(date: Date, lat: number, lng: number) {
 }
 
 export function visitorSky(date: Date = new Date()): Sky {
-  let lat: number | null = null;
-  let lng = 0;
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const coords = TZ_COORDS[tz];
-    if (coords) [lat, lng] = coords;
-    else {
-      // Fallback: derive longitude from the current UTC offset (minutes west).
-      lng = (-date.getTimezoneOffset() / 60) * 15;
-    }
-  } catch {
-    lng = 0;
-  }
+  const { lat, lng } = visitorLocation(date);
 
   // Unknown latitude → assume equatorial so day/night still tracks local solar
   // time, just without seasonal length.
