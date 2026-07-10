@@ -24,6 +24,7 @@ const LINKS = [
   { href: "/projects", label: "Projects" },
   { href: "/photography", label: "Photography" },
   { href: "/journal", label: "Journal" },
+  { href: "/travel", label: "Travel" },
 ] as const;
 
 export function Nav() {
