@@ -349,10 +349,14 @@ function HeroLetter({
       <m.span
         drag={grabbable}
         dragSnapToOrigin
-        dragElastic={0.85}
+        // Tether to a small radius so a grab is an elastic tug near home, not a
+        // free throw across the screen — past the box it resists hard, then
+        // springs back with a soft, settled wobble.
+        dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+        dragElastic={0.28}
         dragMomentum={false}
-        dragTransition={{ bounceStiffness: 180, bounceDamping: 11 }}
-        whileDrag={{ scale: 1.12 }}
+        dragTransition={{ bounceStiffness: 150, bounceDamping: 16 }}
+        whileDrag={{ scale: 1.08 }}
         style={{
           display: "inline-block",
           cursor: grabbable ? "grab" : "inherit",
