@@ -33,8 +33,10 @@ import { springSoftOptions } from "@/lib/motion";
  */
 
 const LETTERS = ["C", "O", "E", "N"] as const;
-// Per-letter parallax depth in px (§11: 2–6px range).
-const DEPTH = [6, 3.5, 3.5, 6];
+// Per-letter parallax depth in px. Outer letters lead, inner letters follow at
+// a shallower depth — the spread is what makes the word feel like a soft body
+// leaning toward the cursor rather than a rigid block sliding.
+const DEPTH = [17, 10, 10, 17];
 const NAV_FONT = 20;
 
 function clamp(v: number, lo: number, hi: number) {
@@ -281,10 +283,19 @@ function HeroLetter({
     enabled ? p * depth * a : 0,
   );
   const ly = useTransform([py, heroAmt], ([p, a]: number[]) =>
-    enabled ? p * (depth * 0.6) * a : 0,
+    enabled ? p * (depth * 0.72) * a : 0,
   );
-  const sx = useSpring(lx, { stiffness: 140, damping: 18, mass: 0.6 });
-  const sy = useSpring(ly, { stiffness: 140, damping: 18, mass: 0.6 });
+  // Soft, floaty spring — low stiffness plus mass scaled by the letter's depth
+  // means the deeper (outer) letters lag a touch more, so the word trails the
+  // cursor as a gentle wave and eases back with a slight overshoot. This is the
+  // difference between "liquid" and "stiff".
+  const springCfg = {
+    stiffness: 70,
+    damping: 15,
+    mass: 0.85 + depth * 0.06,
+  };
+  const sx = useSpring(lx, springCfg);
+  const sy = useSpring(ly, springCfg);
 
   return (
     <m.span
