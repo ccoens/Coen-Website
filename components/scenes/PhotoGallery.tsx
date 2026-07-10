@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { m } from "framer-motion";
 import type { Photo } from "@/content/types";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { Reveal } from "@/components/ui/Reveal";
 import { ParallaxLayer } from "@/components/ui/ParallaxLayer";
 import { PhotoViewer } from "@/components/ui/PhotoViewer";
@@ -25,6 +27,7 @@ const LAYOUT = [
 
 export function PhotoGallery({ photos }: { photos: Photo[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const reduced = useReducedMotion();
 
   return (
     <>
@@ -52,7 +55,22 @@ export function PhotoGallery({ photos }: { photos: Photo[] }) {
                       boxShadow: "0 30px 80px rgba(0,0,0,0.5)",
                     }}
                   >
-                    <span
+                    <m.span
+                      // Film-develop reveal: the photo surfaces from a blurred,
+                      // desaturated, slightly-bright "latent image" into a sharp
+                      // print as it scrolls into view — once per photo.
+                      initial={
+                        reduced
+                          ? false
+                          : { filter: "blur(16px) saturate(0.35) brightness(1.18)", scale: 1.06, opacity: 0.5 }
+                      }
+                      whileInView={
+                        reduced
+                          ? undefined
+                          : { filter: "blur(0px) saturate(1) brightness(1)", scale: 1, opacity: 1 }
+                      }
+                      viewport={{ once: true, amount: 0.35 }}
+                      transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
                       style={{
                         position: "relative",
                         display: "block",
@@ -66,7 +84,7 @@ export function PhotoGallery({ photos }: { photos: Photo[] }) {
                         sizes="(max-width: 900px) 100vw, 70vw"
                         style={{ objectFit: "cover" }}
                       />
-                    </span>
+                    </m.span>
                   </button>
                   {photo.place && (
                     <Reveal delay={0.05}>

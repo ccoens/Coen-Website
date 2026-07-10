@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Reveal } from "./Reveal";
+import { ScrambleText } from "./ScrambleText";
 
 /*
  * SceneHeader — the consistent index + title block that opens each section.
@@ -45,7 +46,7 @@ export function SceneHeader({
               />
             </>
           )}
-          <span style={{ textTransform: "uppercase" }}>{title}</span>
+          <ScrambleText text={title} style={{ textTransform: "uppercase" }} />
         </p>
       </Reveal>
       {lead && (

@@ -176,15 +176,51 @@ export function HeroLogo() {
     });
   });
 
-  // Hero pointer parallax. Only meaningful near the top; disabled if calm/touch.
+  // Hero pointer parallax + idle "breathing". The cursor drives px/py while it
+  // moves; after a short rest the letters keep drifting on a slow, self-running
+  // orbit so the mark is never fully static. Only meaningful near the top (the
+  // per-letter offset is multiplied by heroAmt); disabled if calm/touch.
   useEffect(() => {
     if (reduced || !finePointer) return;
+
+    let idle = false;
+    let idleSince = 0;
+    let idleTimer: number | undefined;
+    let raf = 0;
+
+    const goIdle = () => {
+      idle = true;
+      idleSince = performance.now();
+    };
+    // Begin breathing if the visitor never moves the pointer at all.
+    idleTimer = window.setTimeout(goIdle, 2600);
+
     const onMove = (e: PointerEvent) => {
+      idle = false;
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(goIdle, 2600);
       px.set((e.clientX / window.innerWidth) * 2 - 1);
       py.set((e.clientY / window.innerHeight) * 2 - 1);
     };
+
+    // Slow Lissajous drift; amplitude eases in over ~1.4s so it never jumps.
+    const tick = (now: number) => {
+      if (idle) {
+        const t = (now - idleSince) / 1000;
+        const amp = Math.min(t / 1.4, 1) * 0.32;
+        px.set(Math.sin(t * 0.55) * amp);
+        py.set(Math.sin(t * 0.42 + 1.3) * amp * 0.8);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
     window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.clearTimeout(idleTimer);
+      cancelAnimationFrame(raf);
+    };
   }, [reduced, finePointer, px, py]);
 
   // Docked logo acts as "home": scroll to top on the landing route, otherwise

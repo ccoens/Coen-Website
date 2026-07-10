@@ -1,5 +1,6 @@
 import type { Photo } from "@/content/types";
 import { Reveal } from "@/components/ui/Reveal";
+import { ScrambleText } from "@/components/ui/ScrambleText";
 import { PhotoGallery } from "./PhotoGallery";
 
 /*
@@ -43,7 +44,8 @@ export function Photography({
               style={{ color: "var(--dark-text-tertiary)", marginBottom: "var(--space-2)" }}
             >
               <span style={{ color: "var(--accent)", fontWeight: 600 }}>03</span>
-              {"  —  PHOTOGRAPHY"}
+              {"  —  "}
+              <ScrambleText text="PHOTOGRAPHY" />
             </p>
           </Reveal>
           <Reveal delay={0.06}>
