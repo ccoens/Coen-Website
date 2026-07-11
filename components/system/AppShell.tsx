@@ -10,6 +10,8 @@ import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useAccent } from "@/lib/accent";
 import { useSky } from "@/lib/sky";
 import { useVitality } from "@/lib/vitality";
+import { startPulse } from "@/lib/behaviorPulse";
+import { recordVisitTime } from "@/lib/rhythm";
 import { SmoothScroll } from "./SmoothScroll";
 import { Background } from "./Background";
 import { SkyWash } from "./SkyWash";
@@ -24,6 +26,8 @@ import { VisitorSignal } from "./VisitorSignal";
 import { EngagementTracker } from "./EngagementTracker";
 import { Perceptive } from "./Perceptive";
 import { Predictor } from "./Predictor";
+import { Dossier } from "./Dossier";
+import { ExitIntent } from "./ExitIntent";
 import { PageTransition } from "./PageTransition";
 import { ContactProvider } from "./Contact";
 
@@ -46,6 +50,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   useSky();
   // The circadian pulse: the site quietens while Coen sleeps in Canberra.
   useVitality();
+
+  // Begin reading the visitor (all on-device): motion pulse + visit rhythm.
+  useEffect(() => {
+    startPulse();
+    recordVisitTime();
+  }, []);
 
   // Hide the native cursor only when we're actually mounting the physics orb.
   useEffect(() => {
@@ -84,6 +94,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <EngagementTracker />
             <Perceptive />
             <Predictor />
+            <Dossier />
+            <ExitIntent />
           </ContactProvider>
         </SmoothScroll>
       </LazyMotion>

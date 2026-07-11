@@ -5,6 +5,7 @@ import { AboutGlimpse } from "@/components/scenes/AboutGlimpse";
 import { Current } from "@/components/scenes/Current";
 import { VisitorLine } from "@/components/scenes/VisitorLine";
 import { FooterSigil } from "@/components/system/FooterSigil";
+import { DossierTrigger } from "@/components/system/DossierTrigger";
 
 import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
@@ -46,9 +47,12 @@ export default function Home() {
             gap: "var(--space-4)",
           }}
         >
-          <p className="type-caption">
-            coen.life · Built as a continuous spatial interface.
-          </p>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <p className="type-caption">
+              coen.life · Built as a continuous spatial interface.
+            </p>
+            <DossierTrigger />
+          </div>
           <FooterSigil />
         </div>
       </footer>

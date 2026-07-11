@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { addDwell, SECTION_META } from "@/lib/engagement";
+import { recordRoute } from "@/lib/visitorType";
 
 /*
  * EngagementTracker — quietly measures how long the visitor spends on each
@@ -14,6 +15,7 @@ export function EngagementTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
+    recordRoute(pathname);
     const section = pathname === "/" ? null : pathname.replace(/^\//, "").split("/")[0];
     if (!section || !SECTION_META[section]) return;
 
