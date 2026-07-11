@@ -28,6 +28,7 @@ import { Perceptive } from "./Perceptive";
 import { Predictor } from "./Predictor";
 import { Dossier } from "./Dossier";
 import { ExitIntent } from "./ExitIntent";
+import { Dream } from "./Dream";
 import { PageTransition } from "./PageTransition";
 import { ContactProvider } from "./Contact";
 
@@ -96,6 +97,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Predictor />
             <Dossier />
             <ExitIntent />
+            <Dream />
           </ContactProvider>
         </SmoothScroll>
       </LazyMotion>
