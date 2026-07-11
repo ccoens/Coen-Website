@@ -24,6 +24,7 @@ export const visitedCountries = [
   "Iceland",
   "Italy",
   "Netherlands",
+  "Poland",
   "Portugal",
   "Slovakia",
   "Spain",
@@ -62,6 +63,7 @@ export const visitedLabels = [
   "Japan",
   "Malta",
   "Netherlands",
+  "Poland",
   "Portugal",
   "San Marino",
   "Singapore",
@@ -78,7 +80,7 @@ export const visitedLabels = [
 
 // Headline stats.
 export const travelStats = {
-  countries: visitedLabels.length, // 29
+  countries: visitedLabels.length, // 30
   continents: 5, // Africa, Asia, Europe, North America, Oceania
 };
 

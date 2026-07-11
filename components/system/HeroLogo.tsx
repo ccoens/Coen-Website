@@ -359,7 +359,10 @@ function HeroLetter({
         whileDrag={{ scale: 1.08 }}
         style={{
           display: "inline-block",
-          cursor: grabbable ? "grab" : "inherit",
+          // Keep the custom orb as the only cursor — a native "grab" here would
+          // show the OS pointer on top of the orb (§10). The letters are still
+          // draggable; the orb is the affordance.
+          cursor: grabbable ? "none" : "inherit",
           pointerEvents: grabbable ? "auto" : "none",
           touchAction: grabbable ? "none" : "auto",
         }}
