@@ -59,7 +59,7 @@ export function Hero({ statement }: { statement: string }) {
           whiteSpace: "nowrap",
         }}
       >
-        Coen — {statement}
+        Coen Hatcher-Ross — {statement}
       </h1>
 
       <m.div

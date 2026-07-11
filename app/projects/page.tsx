@@ -4,7 +4,7 @@ import { Projects } from "@/components/scenes/Projects";
 import { projects } from "@/content/projects";
 
 export const metadata: Metadata = {
-  title: "Projects — Coen",
+  title: "Projects",
   description: "Selected projects, built with care.",
 };
 

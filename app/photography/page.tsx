@@ -3,7 +3,7 @@ import { Photography } from "@/components/scenes/Photography";
 import { photos } from "@/content/photos";
 
 export const metadata: Metadata = {
-  title: "Photography — Coen",
+  title: "Photography",
   description: "Light, held still.",
 };
 

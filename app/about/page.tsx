@@ -5,7 +5,7 @@ import { Current } from "@/components/scenes/Current";
 import { profile } from "@/content/profile";
 
 export const metadata: Metadata = {
-  title: "About — Coen",
+  title: "About",
   description:
     "I'm someone who wants to create a better experience for all, through safety and software.",
 };

@@ -4,7 +4,7 @@ import { Journal } from "@/components/scenes/Journal";
 import { journal } from "@/content/journal";
 
 export const metadata: Metadata = {
-  title: "Journal — Coen",
+  title: "Journal",
   description: "Notes to self, in the open.",
 };
 

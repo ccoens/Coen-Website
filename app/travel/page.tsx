@@ -11,7 +11,7 @@ import {
 } from "@/content/travel";
 
 export const metadata: Metadata = {
-  title: "Travel — Coen",
+  title: "Travel",
   description: "29 countries across 5 continents — where I've been so far.",
 };
 
