@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useCapability } from "@/lib/capability";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { visitorSky } from "@/lib/sky";
+import { computeVitality } from "@/lib/vitality";
 
 /*
  * ShaderHero — the futuristic landing hero (raw WebGL, no 3D library, so it adds
@@ -32,6 +33,8 @@ uniform float uHue;    // degrees
 uniform float uDaylight; // 0 = visitor's deep night, 1 = high sun
 uniform float uEnergy;   // 0 = idle/settled, 1 = fully awake (recent movement)
 uniform float uGold;   // 0..1 golden-hour warmth
+#define NSTIR 10
+uniform vec3 uStir[NSTIR]; // xy = drag point 0..1 (y up), z = remaining life
 
 float hash(vec2 p){ p = fract(p*vec2(123.34,345.45)); p += dot(p, p+34.345); return fract(p.x*p.y); }
 float noise(vec2 p){
@@ -63,6 +66,18 @@ void main(){
   float md = distance(p, m);
   vec2 warp = (p - m) * exp(-md*3.0) * 0.25 * uEnergy;
 
+  // Stir: each recent drag point spins the field tangentially and lingers,
+  // so you can "stir the light" and it keeps swirling after you let go.
+  float stirLight = 0.0;
+  for (int i = 0; i < NSTIR; i++) {
+    float ss = uStir[i].z;
+    vec2 sp = uStir[i].xy; sp.x *= uRes.x/uRes.y;
+    vec2 d = p - sp;
+    float infl = ss * exp(-length(d) * 4.5);
+    warp += vec2(-d.y, d.x) * infl * 0.9;
+    stirLight += infl;
+  }
+
   vec2 q = vec2(fbm(p + t + warp), fbm(p + vec2(5.2,1.3) - t));
   vec2 r = vec2(fbm(p + 3.5*q + vec2(1.7,9.2) + 0.15*t),
                 fbm(p + 3.5*q + vec2(8.3,2.8) - 0.12*t));
@@ -85,6 +100,9 @@ void main(){
 
   // Golden-hour warmth: a faint amber breath when the visitor's sun is low.
   col += hsl2rgb(34.0, 0.55, 0.68) * uGold * (0.05 + 0.05*f);
+
+  // Light stirred up along the drag glows softly as it swirls.
+  col += hsl2rgb(uHue + hueShift, 0.5, 0.72) * clamp(stirLight, 0.0, 1.0) * 0.16;
 
   // Gentle vignette so edges settle into the page.
   float vig = smoothstep(1.25, 0.35, length(uv-0.5));
@@ -152,6 +170,16 @@ export function ShaderHero() {
     const uDaylight = gl.getUniformLocation(prog, "uDaylight");
     const uEnergy = gl.getUniformLocation(prog, "uEnergy");
     const uGold = gl.getUniformLocation(prog, "uGold");
+    const uStir = gl.getUniformLocation(prog, "uStir[0]");
+
+    // Stir points: a small ring of recent drag positions that decay over ~2.5s,
+    // packed into a flat vec3 array each frame (x, y-up, life).
+    const NSTIR = 10;
+    const stirBuf = new Float32Array(NSTIR * 3);
+    const stirPts = Array.from({ length: NSTIR }, () => ({ x: 0, y: 0, life: 0 }));
+    let stirHead = 0;
+    let lastSx = -1;
+    let lastSy = -1;
 
     // Cap DPR — this is a soft background, not crisp UI.
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -180,12 +208,24 @@ export function ShaderHero() {
       tmx = e.clientX / window.innerWidth;
       tmy = e.clientY / window.innerHeight;
       lastMove = performance.now();
+      // Drop a stir point once the pointer has travelled a little, so a drag
+      // lays a trail of swirls rather than one dense blob.
+      if (lastSx < 0 || Math.hypot(tmx - lastSx, tmy - lastSy) > 0.02) {
+        const pt = stirPts[stirHead];
+        stirHead = (stirHead + 1) % NSTIR;
+        pt.x = tmx;
+        pt.y = tmy;
+        pt.life = 1;
+        lastSx = tmx;
+        lastSy = tmy;
+      }
     };
     window.addEventListener("pointermove", onMove, { passive: true });
 
     let hue = 232;
     let daylight = 0.6;
     let gold = 0;
+    let vitality = 1;
     const sample = () => {
       const v = getComputedStyle(document.documentElement).getPropertyValue("--accent-h");
       const n = parseFloat(v);
@@ -194,6 +234,8 @@ export function ShaderHero() {
       const sky = visitorSky();
       daylight = sky.daylight;
       gold = sky.gold;
+      // The field quietens on Coen's circadian pulse — calm while he sleeps.
+      vitality = computeVitality();
     };
     sample();
 
@@ -225,15 +267,25 @@ export function ShaderHero() {
       const dt = Math.min((now - prev) / 1000, 0.05);
       prev = now;
 
-      // Ease energy toward awake (1) or settled (~0.28) by time since last move.
+      // Ease energy toward awake or settled by time since last move, scaled by
+      // Coen's vitality so the field is much calmer while he's asleep.
       const idle = now - lastMove;
-      energy += ((idle > 3500 ? 0.28 : 1) - energy) * 0.02;
+      energy += ((idle > 3500 ? 0.28 : 1) * vitality - energy) * 0.02;
       // Flow slows as it settles but keeps a slow idle drift (never fully stops).
       tAcc += dt * (0.4 + 0.6 * energy);
 
       // Ease the cursor influence.
       mx += (tmx - mx) * 0.06;
       my += (tmy - my) * 0.06;
+
+      // Age + pack stir points (life decays over ~2.5s).
+      for (let i = 0; i < NSTIR; i++) {
+        const pt = stirPts[i];
+        if (pt.life > 0) pt.life = Math.max(0, pt.life - dt * 0.4);
+        stirBuf[i * 3] = pt.x;
+        stirBuf[i * 3 + 1] = 1 - pt.y; // flip to gl y-up
+        stirBuf[i * 3 + 2] = pt.life;
+      }
 
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, tAcc);
@@ -242,6 +294,7 @@ export function ShaderHero() {
       gl.uniform1f(uDaylight, daylight);
       gl.uniform1f(uEnergy, energy);
       gl.uniform1f(uGold, gold);
+      gl.uniform3fv(uStir, stirBuf);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(loop);
     };

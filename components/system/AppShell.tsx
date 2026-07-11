@@ -9,13 +9,16 @@ import {
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useAccent } from "@/lib/accent";
 import { useSky } from "@/lib/sky";
+import { useVitality } from "@/lib/vitality";
 import { SmoothScroll } from "./SmoothScroll";
 import { Background } from "./Background";
 import { SkyWash } from "./SkyWash";
+import { RestVeil } from "./RestVeil";
 import { LightField } from "./LightField";
 import { HeroLogo } from "./HeroLogo";
 import { Nav } from "./Nav";
 import { Cursor } from "./Cursor";
+import { Echoes } from "./Echoes";
 import { Screensaver } from "./Screensaver";
 import { VisitorSignal } from "./VisitorSignal";
 import { PageTransition } from "./PageTransition";
@@ -38,6 +41,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   useAccent(reduced);
   // Publish the visitor's real local sky (timezone + solar geometry) to CSS.
   useSky();
+  // The circadian pulse: the site quietens while Coen sleeps in Canberra.
+  useVitality();
 
   // Hide the native cursor only when we're actually mounting the physics orb.
   useEffect(() => {
@@ -62,12 +67,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <ContactProvider>
             <Background />
             <SkyWash />
+            <Echoes />
             <LightField />
             <HeroLogo />
             <Nav />
             <main id="main">
               <PageTransition>{children}</PageTransition>
             </main>
+            <RestVeil />
             <Cursor />
             <Screensaver />
             <VisitorSignal />

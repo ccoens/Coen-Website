@@ -15,13 +15,18 @@ export function Sigil({
   seed,
   size = 72,
   animate = true,
+  count = 6,
 }: {
   seed: number;
   size?: number;
   animate?: boolean;
+  /** Number of stars. Because sigilStars is a stable sequence, growing this
+   *  keeps every earlier star and only appends new ones — a constellation that
+   *  accumulates over return visits. */
+  count?: number;
 }) {
   const reduced = useReducedMotion();
-  const stars = useMemo(() => sigilStars(seed, 6), [seed]);
+  const stars = useMemo(() => sigilStars(seed, count), [seed, count]);
   const linePath = useMemo(
     () => stars.map((s, i) => `${i === 0 ? "M" : "L"} ${s.x.toFixed(1)} ${s.y.toFixed(1)}`).join(" "),
     [stars],

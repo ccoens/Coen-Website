@@ -3,6 +3,7 @@ import { CanberraTime } from "@/components/scenes/CanberraTime";
 import { FeaturedWork } from "@/components/scenes/FeaturedWork";
 import { AboutGlimpse } from "@/components/scenes/AboutGlimpse";
 import { Current } from "@/components/scenes/Current";
+import { VisitorLine } from "@/components/scenes/VisitorLine";
 import { FooterSigil } from "@/components/system/FooterSigil";
 
 import { profile } from "@/content/profile";
@@ -23,6 +24,13 @@ export default function Home() {
       </div>
       <AboutGlimpse profile={profile} />
       <Current profile={profile} />
+      <section
+        aria-label="A line just for you"
+        className="scene-inner"
+        style={{ paddingBlock: "var(--space-8)" }}
+      >
+        <VisitorLine />
+      </section>
       <footer
         className="scene-inner"
         style={{ paddingTop: "var(--space-6)", paddingBottom: "var(--space-9)" }}
