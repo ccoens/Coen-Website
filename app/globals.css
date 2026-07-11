@@ -61,9 +61,13 @@ body {
 body[data-custom-cursor="true"] {
   cursor: none;
 }
-body[data-custom-cursor="true"] a,
-body[data-custom-cursor="true"] button {
-  cursor: none;
+/* When the physics orb is active it is the ONLY cursor. Force it on every
+   element so inline cursors (pointer on tiles, not-allowed on locked cards,
+   grab on drag targets, SVGs) can't leak the native Chrome cursor next to the
+   orb. Real text fields keep their caret. */
+body[data-custom-cursor="true"]
+  *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  cursor: none !important;
 }
 
 /* Predicted target — the Predictor lights up the link it thinks you're heading
