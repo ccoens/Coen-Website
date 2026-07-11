@@ -95,7 +95,7 @@ export function Perceptive() {
             position: "fixed",
             left: "50%",
             bottom: "calc(var(--space-4))",
-            transform: "translateX(-50%)",
+            x: "-50%",
             zIndex: 88,
             pointerEvents: "none",
             padding: "9px 16px",

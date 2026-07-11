@@ -58,16 +58,27 @@ body {
      data attribute set from lib/capability so touch keeps the native cursor. */
 }
 
-body[data-custom-cursor="true"] {
-  cursor: none;
-}
 /* When the physics orb is active it is the ONLY cursor. Force it on every
    element so inline cursors (pointer on tiles, not-allowed on locked cards,
    grab on drag targets, SVGs) can't leak the native Chrome cursor next to the
-   orb. Real text fields keep their caret. */
-body[data-custom-cursor="true"]
-  *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+   orb. The two overrides below have higher specificity, so they win. */
+body[data-custom-cursor="true"],
+body[data-custom-cursor="true"] * {
   cursor: none !important;
+}
+/* Real text fields keep their caret. */
+body[data-custom-cursor="true"] input,
+body[data-custom-cursor="true"] textarea,
+body[data-custom-cursor="true"] select,
+body[data-custom-cursor="true"] [contenteditable="true"] {
+  cursor: auto !important;
+}
+/* The orb deliberately fades out over "hidden" zones (the nav) so it doesn't
+   fight the nav's own hover feedback — bring the native cursor back there, or
+   there'd be no cursor at all. */
+body[data-custom-cursor="true"] [data-cursor="hidden"],
+body[data-custom-cursor="true"] [data-cursor="hidden"] * {
+  cursor: auto !important;
 }
 
 /* Predicted target — the Predictor lights up the link it thinks you're heading

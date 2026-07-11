@@ -44,6 +44,14 @@ export function Dossier() {
     };
   }, []);
 
+  // Lock the page behind the modal (the panel itself opts out of Lenis via
+  // data-lenis-prevent so it scrolls natively).
+  useEffect(() => {
+    if (!open) return;
+    document.documentElement.classList.add("scroll-locked");
+    return () => document.documentElement.classList.remove("scroll-locked");
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const gathered: Line[] = [];
@@ -103,6 +111,7 @@ export function Dossier() {
         >
           <m.div
             onClick={(e) => e.stopPropagation()}
+            data-lenis-prevent
             initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
             animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
@@ -111,6 +120,7 @@ export function Dossier() {
               width: "min(520px, 100%)",
               maxHeight: "82vh",
               overflowY: "auto",
+              overscrollBehavior: "contain",
               background: "var(--surface-solid)",
               border: "1px solid var(--border-strong)",
               borderRadius: "var(--radius-lg)",

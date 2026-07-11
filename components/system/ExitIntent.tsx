@@ -82,7 +82,7 @@ export function ExitIntent() {
             position: "fixed",
             top: "var(--space-3)",
             left: "50%",
-            transform: "translateX(-50%)",
+            x: "-50%",
             zIndex: 95,
             display: "flex",
             alignItems: "center",
