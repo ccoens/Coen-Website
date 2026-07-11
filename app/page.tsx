@@ -47,8 +47,7 @@ export default function Home() {
           }}
         >
           <p className="type-caption">
-            © {new Date().getFullYear()} Coen · coen.life · Built as a continuous
-            spatial interface.
+            coen.life · Built as a continuous spatial interface.
           </p>
           <FooterSigil />
         </div>
