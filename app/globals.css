@@ -66,6 +66,22 @@ body[data-custom-cursor="true"] button {
   cursor: none;
 }
 
+/* Predicted target — the Predictor lights up the link it thinks you're heading
+   toward (and prefetches it). Subtle lift + accent glow; motion dropped when the
+   visitor asks for less. */
+.is-predicted {
+  transform: scale(1.04);
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+  transition:
+    transform 220ms var(--ease-primary),
+    filter 220ms var(--ease-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-predicted {
+    transform: none;
+  }
+}
+
 /* Type primitives — structural, carry as much weight as imagery (§5). */
 .type-h1 {
   font-size: var(--fs-h1);

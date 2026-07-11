@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import { Sigil } from "@/components/ui/Sigil";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -11,6 +12,7 @@ import {
   elapsedLabel,
   type VisitRecord,
 } from "@/lib/visitor";
+import { topSection, type TopSection } from "@/lib/engagement";
 import { photos } from "@/content/photos";
 import { projects } from "@/content/projects";
 
@@ -30,6 +32,8 @@ interface Capsule {
   newProjects: number;
   id: number;
   seed: number;
+  visits: number;
+  top: TopSection | null;
 }
 
 export function VisitorSignal() {
@@ -51,6 +55,8 @@ export function VisitorSignal() {
         newProjects: Math.max(0, projectCount - prior.projects),
         id: identity.id,
         seed: identity.seed,
+        visits: (prior.count ?? 0) + 1,
+        top: topSection(),
       });
       setShow(true);
     }
@@ -122,6 +128,17 @@ export function VisitorSignal() {
               It&apos;s been {capsule.elapsed}
               {news.length > 0 ? ` — ${news.join(" and ")} since.` : "."}
             </p>
+            {capsule.top && (
+              <p className="type-caption" style={{ marginTop: 6, lineHeight: 1.4 }}>
+                <Link
+                  href={capsule.top.href}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}
+                >
+                  {capsule.visits} visits in — {capsule.top.label} holds you longest ↗
+                </Link>
+              </p>
+            )}
             <p
               className="type-caption"
               style={{ color: "var(--text-tertiary)", marginTop: 5, letterSpacing: "0.04em" }}

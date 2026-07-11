@@ -21,6 +21,9 @@ import { Cursor } from "./Cursor";
 import { Echoes } from "./Echoes";
 import { Screensaver } from "./Screensaver";
 import { VisitorSignal } from "./VisitorSignal";
+import { EngagementTracker } from "./EngagementTracker";
+import { Perceptive } from "./Perceptive";
+import { Predictor } from "./Predictor";
 import { PageTransition } from "./PageTransition";
 import { ContactProvider } from "./Contact";
 
@@ -78,6 +81,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Cursor />
             <Screensaver />
             <VisitorSignal />
+            <EngagementTracker />
+            <Perceptive />
+            <Predictor />
           </ContactProvider>
         </SmoothScroll>
       </LazyMotion>
