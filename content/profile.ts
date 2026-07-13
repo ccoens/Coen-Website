@@ -31,8 +31,6 @@ export const profile: Profile = {
   email: "coenhatcherross@gmail.com",
 
   socials: [
-    { label: "FILL: X", href: "#fill-x" },
-    { label: "FILL: GitHub", href: "#fill-github" },
-    { label: "FILL: Read.cv", href: "#fill-readcv" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/coens/" },
   ],
 };
