@@ -6,6 +6,7 @@ import { Current } from "@/components/scenes/Current";
 import { VisitorLine } from "@/components/scenes/VisitorLine";
 import { FooterSigil } from "@/components/system/FooterSigil";
 import { DossierTrigger } from "@/components/system/DossierTrigger";
+import { StarSketchTrigger } from "@/components/system/StarSketchTrigger";
 
 import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
@@ -52,6 +53,7 @@ export default function Home() {
               coen.life · Built as a continuous spatial interface.
             </p>
             <DossierTrigger />
+            <StarSketchTrigger />
           </div>
           <FooterSigil />
         </div>

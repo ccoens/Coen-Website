@@ -29,6 +29,7 @@ import { Predictor } from "./Predictor";
 import { Dossier } from "./Dossier";
 import { ExitIntent } from "./ExitIntent";
 import { Dream } from "./Dream";
+import { StarSketch } from "./StarSketch";
 import { PageTransition } from "./PageTransition";
 import { ContactProvider } from "./Contact";
 
@@ -98,6 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Dossier />
             <ExitIntent />
             <Dream />
+            <StarSketch />
           </ContactProvider>
         </SmoothScroll>
       </LazyMotion>
