@@ -6,6 +6,7 @@ import { canberraNow, canberraStatus } from "@/lib/time";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { CanberraSky } from "@/components/system/CanberraSky";
 import { Connection } from "@/components/scenes/Connection";
+import { SkyTimelapseTrigger } from "@/components/system/SkyTimelapseTrigger";
 
 /*
  * CanberraTime — the first beat after the hero: a large, live "Time in Canberra"
@@ -127,6 +128,7 @@ export function CanberraTime() {
 
         {/* The "you and Coen" beat: localized hello, distance + compass, shared sky. */}
         <Connection />
+        <SkyTimelapseTrigger />
       </m.div>
     </section>
   );
