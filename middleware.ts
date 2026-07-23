@@ -56,8 +56,12 @@ const PAGE = `<!doctype html>
 </body>
 </html>`;
 
+// EMERGENCY TAKEDOWN — forced ON. To bring the site back: set this to false
+// (or delete these two lines) and push; that redeploys the live site.
+const FORCE_MAINTENANCE = true;
+
 export function middleware(req: NextRequest) {
-  if (!ON(process.env.MAINTENANCE)) return NextResponse.next();
+  if (!FORCE_MAINTENANCE && !ON(process.env.MAINTENANCE)) return NextResponse.next();
 
   // Owner bypass: ?preview=<secret> sets a cookie; a matching cookie lets you through.
   const secret = process.env.MAINTENANCE_BYPASS;
