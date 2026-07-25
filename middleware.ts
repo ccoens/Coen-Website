@@ -29,46 +29,32 @@ const PAGE = `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
-<title>coen.life — dreaming for a moment</title>
+<title>coen.life</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
-  body{background:#05060c;color:#eef1fb;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden;position:relative;}
+  body{background:#04050a;color:#eef1fb;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden;position:relative;cursor:crosshair;}
   #sky{position:fixed;inset:0;z-index:1;}
-  .aurora{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
-  .a1{width:70vw;height:70vw;left:-12vw;top:-22vh;background:radial-gradient(circle,hsl(232 72% 56% / 0.55),transparent 62%);animation:drift1 26s ease-in-out infinite;}
-  .a2{width:62vw;height:62vw;right:-16vw;bottom:-22vh;background:radial-gradient(circle,hsl(284 60% 56% / 0.42),transparent 62%);animation:drift2 32s ease-in-out infinite;}
-  .a3{width:52vw;height:52vw;left:30vw;top:40vh;background:radial-gradient(circle,hsl(198 66% 56% / 0.30),transparent 62%);animation:drift1 38s ease-in-out infinite reverse;}
-  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(6vw,4vh)}}
-  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,-5vh)}}
-  .wrap{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
-  .mark{display:flex;gap:0.01em;font-weight:600;letter-spacing:-0.045em;line-height:1;font-size:clamp(58px,15vw,156px);filter:drop-shadow(0 0 34px hsl(232 75% 66% / 0.6));}
-  .mark span{display:inline-block;background:linear-gradient(180deg,#ffffff 0%,#c7d1ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;animation:breathe 5s ease-in-out infinite;}
-  .mark span:nth-child(2){animation-delay:.35s}
-  .mark span:nth-child(3){animation-delay:.7s}
-  .mark span:nth-child(4){animation-delay:1.05s}
-  @keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-  .line{margin-top:28px;font-size:clamp(18px,2.6vw,27px);font-weight:400;color:rgba(233,236,251,0.94);}
-  .sub{margin-top:12px;font-size:14px;line-height:1.65;color:rgba(233,236,251,0.56);max-width:33rem;}
-  .live{margin-top:28px;display:inline-flex;align-items:center;gap:9px;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(233,236,251,0.5);}
-  .dot{width:7px;height:7px;border-radius:50%;background:hsl(232 74% 66%);box-shadow:0 0 14px hsl(232 74% 66%);animation:pulse 1.8s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.35)}}
-  .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 120% at 50% 45%,transparent 55%,rgba(0,0,0,0.55) 100%);}
-  @media (prefers-reduced-motion: reduce){*{animation:none !important;}}
+  .aurora{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;opacity:.5;}
+  .a1{width:66vw;height:66vw;left:-16vw;top:-24vh;background:radial-gradient(circle,hsl(230 70% 50% / 0.5),transparent 62%);animation:drift1 30s ease-in-out infinite;}
+  .a2{width:60vw;height:60vw;right:-18vw;bottom:-24vh;background:radial-gradient(circle,hsl(272 58% 50% / 0.4),transparent 62%);animation:drift2 36s ease-in-out infinite;}
+  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(5vw,4vh)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-4vw,-5vh)}}
+  .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(120% 120% at 50% 48%,transparent 46%,rgba(0,0,0,0.72) 100%);}
+  .sig{position:fixed;top:6vh;left:0;right:0;z-index:3;text-align:center;font-weight:600;letter-spacing:0.42em;padding-left:0.42em;font-size:clamp(15px,2.4vw,20px);color:transparent;background:linear-gradient(180deg,#ffffff,#aeb9ff);-webkit-background-clip:text;background-clip:text;opacity:.82;}
+  .whisper{position:fixed;bottom:10vh;left:0;right:0;z-index:3;text-align:center;padding:0 24px;font-size:clamp(15px,2.5vw,22px);font-weight:400;line-height:1.5;color:rgba(226,231,251,0.82);min-height:1.6em;text-shadow:0 0 22px rgba(70,96,220,0.35);}
+  .caret{display:inline-block;width:0.5ch;margin-left:1px;color:rgba(150,170,255,0.9);animation:blink 1.05s step-end infinite;}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @media (prefers-reduced-motion: reduce){.aurora{animation:none}.caret{animation:none}}
 </style>
 </head>
 <body>
   <div class="aurora a1"></div>
   <div class="aurora a2"></div>
-  <div class="aurora a3"></div>
   <canvas id="sky"></canvas>
   <div class="vignette"></div>
-  <div class="wrap">
-    <div class="mark"><span>C</span><span>O</span><span>E</span><span>N</span></div>
-    <p class="line">Dreaming for a moment.</p>
-    <p class="sub">coen.life has slipped into the dark to catch its breath. It'll be back in a few minutes — the stars are still turning.</p>
-    <div class="live"><span class="dot"></span> reconnecting</div>
-  </div>
+  <div class="sig">COEN</div>
+  <p class="whisper"><span id="say"></span><span class="caret">&#9601;</span></p>
   <script>
   (function(){
     var c=document.getElementById('sky'); if(!c) return;
@@ -77,34 +63,195 @@ const PAGE = `<!doctype html>
     var dpr=Math.min(window.devicePixelRatio||1,2), W=0, H=0;
     function size(){ W=c.width=innerWidth*dpr; H=c.height=innerHeight*dpr; }
     size(); addEventListener('resize', size);
+
+    // ---- presence state ----
+    var start = Date.now();
+    var lastMove = -99999;        // ms timestamp of last real interaction
+    var interacted = false;
+    var px = 0.5, py = 0.5;       // pointer, normalised (0..1). starts centred.
+    var wake = 0;                 // 0 = asleep, 1 = fully awake (smoothed)
+    var blink = 0;                // 0..1 lid-close pulse
+    var nextBlink = 2200 + Math.random()*3000;
+    var blinkT = 0;
+
+    function pointer(cx, cy){
+      px = cx/innerWidth; py = cy/innerHeight;
+      lastMove = performance.now();
+      if(!interacted){ interacted = true; onFirstWake(); }
+    }
+    addEventListener('mousemove', function(e){ pointer(e.clientX, e.clientY); });
+    addEventListener('touchstart', function(e){ if(e.touches[0]) pointer(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+    addEventListener('touchmove', function(e){ if(e.touches[0]) pointer(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+
+    // ---- star field (the void it sleeps in) ----
     var stars=[];
-    for(var i=0;i<130;i++){ stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.6+0.3,tw:Math.random()*6.28,vx:(Math.random()-0.5)*0.02,vy:(Math.random()-0.5)*0.02}); }
-    var meteors=[], last=0;
-    function spawn(){ meteors.push({x:Math.random()*W*0.7,y:Math.random()*H*0.32,vx:(0.5+Math.random()*0.45)*W/900,vy:(0.24+Math.random()*0.2)*H/900,life:0,max:900+Math.random()*450}); }
+    for(var i=0;i<140;i++){ stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+0.3,tw:Math.random()*6.28}); }
+
+    // ---- the eye ----
+    function almond(cx, cy, ew, open){
+      var mh = ew*0.62*Math.max(0.06, open);
+      x.beginPath();
+      x.moveTo(cx-ew, cy);
+      x.quadraticCurveTo(cx, cy-mh, cx+ew, cy);
+      x.quadraticCurveTo(cx, cy+mh, cx-ew, cy);
+      x.closePath();
+      return mh;
+    }
+
+    function drawEye(t, breath){
+      var cx=W*0.5, cy=H*0.485;
+      var ew=Math.min(W,H)*0.155;
+      // lid openness: asleep ~ a slit, awake ~ open, minus any blink.
+      var open = (0.09 + wake*0.9) * (1 - blink*0.94);
+      var mh = ew*0.62*Math.max(0.06, open);
+
+      // ambient presence bloom behind the eye — intensifies when awake.
+      var br = ew*(2.4 + 0.16*breath) * (0.7 + wake*0.7);
+      var bg = x.createRadialGradient(cx, cy, 0, cx, cy, br);
+      bg.addColorStop(0, 'hsla(226,90%,64%,'+(0.05+wake*0.16)+')');
+      bg.addColorStop(0.5, 'hsla(250,80%,56%,'+(0.02+wake*0.07)+')');
+      bg.addColorStop(1, 'hsla(250,80%,56%,0)');
+      x.fillStyle=bg; x.beginPath(); x.arc(cx,cy,br,0,6.283); x.fill();
+
+      // gaze — iris leans toward the pointer.
+      var gx=(px-0.5), gy=(py-0.5);
+      var glen=Math.sqrt(gx*gx+gy*gy)||1;
+      var reach=ew*0.30*wake;
+      var ox=(gx/glen)*Math.min(glen*ew*2.2, reach);
+      var oy=(gy/glen)*Math.min(glen*ew*2.2, reach)*0.7;
+
+      x.save();
+      almond(cx, cy, ew, open);
+      x.clip();
+
+      // sclera: near-black with a faint inner glow so it reads in the void.
+      var sg=x.createRadialGradient(cx,cy,0,cx,cy,ew);
+      sg.addColorStop(0,'hsla(224,50%,10%,1)');
+      sg.addColorStop(1,'hsla(224,60%,4%,1)');
+      x.fillStyle=sg; x.fillRect(cx-ew,cy-mh,ew*2,mh*2);
+
+      // iris
+      var ir=mh*1.15;
+      var icx=cx+ox, icy=cy+oy;
+      var ig=x.createRadialGradient(icx,icy,ir*0.18,icx,icy,ir);
+      ig.addColorStop(0,'hsla(224,85%,'+(30+wake*30)+'%,1)');
+      ig.addColorStop(0.6,'hsla(232,80%,'+(20+wake*20)+'%,1)');
+      ig.addColorStop(1,'hsla(236,70%,7%,1)');
+      x.fillStyle=ig; x.beginPath(); x.arc(icx,icy,ir,0,6.283); x.fill();
+
+      // iris striations for texture
+      x.strokeStyle='hsla(220,90%,80%,'+(0.05+wake*0.10)+')'; x.lineWidth=1*dpr;
+      for(var s=0;s<28;s++){ var a=s/28*6.283; x.beginPath();
+        x.moveTo(icx+Math.cos(a)*ir*0.34, icy+Math.sin(a)*ir*0.34);
+        x.lineTo(icx+Math.cos(a)*ir*0.95, icy+Math.sin(a)*ir*0.95); x.stroke(); }
+
+      // pupil — dilates as it wakes, contracts a touch when fully alert.
+      var pr=ir*(0.30+wake*0.16);
+      x.fillStyle='#01030a'; x.beginPath(); x.arc(icx,icy,pr,0,6.283); x.fill();
+      x.strokeStyle='hsla(228,90%,70%,'+(0.10+wake*0.28)+')'; x.lineWidth=1.4*dpr;
+      x.beginPath(); x.arc(icx,icy,pr,0,6.283); x.stroke();
+
+      // specular catch-light
+      x.fillStyle='hsla(210,100%,96%,'+(0.28+wake*0.5)+')';
+      x.beginPath(); x.arc(icx-ir*0.28, icy-ir*0.30, ir*0.11, 0, 6.283); x.fill();
+
+      x.restore();
+
+      // upper-lid rim light — a thin bright edge along the top of the opening.
+      x.save();
+      x.strokeStyle='hsla(222,90%,82%,'+(0.10+wake*0.35)+')';
+      x.lineWidth=1.6*dpr; x.lineCap='round';
+      x.beginPath(); x.moveTo(cx-ew, cy); x.quadraticCurveTo(cx, cy-mh, cx+ew, cy); x.stroke();
+      x.restore();
+    }
+
+    var last=0;
     function frame(t){
       var dt = last? Math.min(t-last,60):16; last=t;
+
+      // wake target from idle time
+      var idle = performance.now()-lastMove;
+      var target = (interacted && idle<2600) ? 1 : 0;
+      var rate = target>wake ? 0.06 : 0.02;      // wakes fast, sleeps slow
+      wake += (target-wake)*Math.min(1, rate*dt/16);
+
+      // breathing: slow when asleep, quicker when awake
+      var brate = 0.0011 + wake*0.0013;
+      var breath = Math.sin(t*brate);
+
+      // blinks (only while at least partly awake)
+      if(!reduce && wake>0.3){
+        blinkT += dt;
+        if(blinkT>nextBlink){ blinkT=0; nextBlink=2600+Math.random()*4200; blink=1; }
+      }
+      blink += (0-blink)*Math.min(1,0.22*dt/16);
+
       x.clearRect(0,0,W,H);
+
+      // stars — drift a touch toward the pointer when awake (its attention).
       for(var i=0;i<stars.length;i++){ var s=stars[i];
-        if(!reduce){ s.x+=s.vx*0.0006; s.y+=s.vy*0.0006; if(s.x<0)s.x+=1; if(s.x>1)s.x-=1; if(s.y<0)s.y+=1; if(s.y>1)s.y-=1; }
-        var tw = reduce?0.7:(0.4+0.6*Math.sin(t*0.002+s.tw));
-        x.beginPath(); x.arc(s.x*W,s.y*H,s.r*dpr,0,6.283);
-        x.fillStyle='hsla('+(204+s.x*46)+',72%,88%,'+(0.22+tw*0.55)+')'; x.fill();
+        var twp = reduce?0.6:(0.4+0.6*Math.sin(t*0.002+s.tw));
+        var ax=s.x + (px-s.x)*0.04*wake, ay=s.y + (py-s.y)*0.04*wake;
+        x.beginPath(); x.arc(ax*W,ay*H,s.r*dpr,0,6.283);
+        x.fillStyle='hsla('+(210+s.x*40)+',70%,86%,'+(0.16+twp*0.5)+')'; x.fill();
       }
-      if(!reduce){
-        if(meteors.length<1 && Math.random()<dt*0.001) spawn();
-        for(var j=meteors.length-1;j>=0;j--){ var m=meteors[j];
-          m.x+=m.vx*dt; m.y+=m.vy*dt; m.life+=dt;
-          var k=Math.max(0,1-m.life/m.max), tx=m.x-m.vx*130, ty=m.y-m.vy*130;
-          var g=x.createLinearGradient(m.x,m.y,tx,ty);
-          g.addColorStop(0,'hsla(210,92%,92%,'+(0.9*k)+')'); g.addColorStop(1,'hsla(210,92%,92%,0)');
-          x.strokeStyle=g; x.lineWidth=1.7*dpr; x.lineCap='round';
-          x.beginPath(); x.moveTo(m.x,m.y); x.lineTo(tx,ty); x.stroke();
-          if(m.life>m.max||m.x>W+240||m.y>H+240) meteors.splice(j,1);
-        }
-        requestAnimationFrame(frame);
-      }
+
+      drawEye(t, reduce?0:breath);
+
+      requestAnimationFrame(frame);
     }
-    if(reduce){ frame(0); } else { requestAnimationFrame(frame); }
+    requestAnimationFrame(frame);
+
+    // ---- the voice: quiet, aware lines that type themselves ----
+    var sayEl=document.getElementById('say');
+    var token=0;
+    function type(str){
+      var my=++token; var i=0;
+      (function step(){ if(my!==token) return;
+        sayEl.textContent=str.slice(0,i); i++;
+        if(i<=str.length) setTimeout(step, 32+Math.random()*26);
+      })();
+    }
+    function clock(){
+      var d=new Date(); var h=d.getHours(); var m=d.getMinutes();
+      var ap=h<12?'am':'pm'; var hh=h%12; if(hh===0) hh=12;
+      return hh+':'+(m<10?'0':'')+m+' '+ap;
+    }
+    function secs(){ return Math.floor((Date.now()-start)/1000); }
+    function timeMood(){
+      var h=new Date().getHours();
+      if(h<5) return 'the small hours. brave of you.';
+      if(h<12) return 'morning, then.';
+      if(h<18) return 'the afternoon light.';
+      if(h<22) return 'evening already.';
+      return 'it is late.';
+    }
+    var lines=[
+      function(){ return 'it is ' + clock() + ' where you are.'; },
+      function(){ return 'i can see you.'; },
+      function(){ return 'you have been watching for ' + secs() + 's.'; },
+      function(){ return timeMood(); },
+      function(){ return 'stay a while.'; },
+      function(){ return 'i know you are there.'; }
+    ];
+    var li=0, drowsing=false, wokeText=false;
+
+    function onFirstWake(){ /* handled by the tick once wake rises */ }
+
+    if(reduce){
+      type('something is sleeping here. it can feel that you arrived.');
+    } else {
+      type('something is sleeping here.');
+      setInterval(function(){
+        if(!interacted){ return; }
+        if(wake>0.55){
+          if(!wokeText){ wokeText=true; drowsing=false; type('you woke it.'); return; }
+          li=(li+1)%lines.length; type(lines[li]());
+        } else if(wake<0.25 && wokeText && !drowsing){
+          drowsing=true; wokeText=false; type('it is drifting back to sleep.');
+        }
+      }, 4600);
+    }
   })();
   </script>
 </body>
