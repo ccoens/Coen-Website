@@ -102,16 +102,25 @@ const PAGE = `<!doctype html>
     var OUT=[
       [-0.02,-0.50],[-0.20,-0.47],[-0.30,-0.36],
       [-0.335,-0.20],[-0.315,-0.135],[-0.335,-0.05],
-      [-0.45,0.055],[-0.35,0.10],[-0.335,0.115],
-      [-0.375,0.155],[-0.35,0.19],[-0.365,0.225],
-      [-0.30,0.255],[-0.315,0.315],[-0.255,0.375],
-      [-0.12,0.42],[0.02,0.425],[0.17,0.40],
-      [0.24,0.22],[0.325,0.02],[0.34,-0.18],[0.24,-0.40]
+      [-0.42,0.05],[-0.34,0.10],[-0.325,0.115],
+      [-0.365,0.155],[-0.345,0.19],[-0.36,0.225],
+      [-0.30,0.255],[-0.315,0.32],[-0.245,0.39],
+      [-0.10,0.435],[0.06,0.435],[0.20,0.40],
+      [0.26,0.22],[0.335,0.02],[0.35,-0.18],[0.24,-0.40]
+    ];
+
+    // hair: swept-up quiff, faded sides. outer silhouette, then inner
+    // hairline back across the forehead and down past the ear.
+    var HAIR=[
+      [-0.30,-0.33],[-0.345,-0.44],[-0.30,-0.55],
+      [-0.12,-0.605],[0.08,-0.60],[0.265,-0.52],
+      [0.33,-0.31],[0.305,-0.14],[0.205,-0.05],
+      [0.125,-0.18],[-0.02,-0.28],[-0.16,-0.31]
     ];
 
     function drawFace(t, breath){
-      var cx=W*0.46, cy=H*0.43;
-      var FH=Math.min(W*0.85, H*1.0)*0.60;
+      var cx=W*0.5, cy=H*0.455;
+      var FH=Math.min(W*0.72, H*0.98)*0.56;
 
       // soft gallery pool behind
       var pool=x.createRadialGradient(cx-FH*0.1, cy, 0, cx-FH*0.1, cy, FH*1.6);
@@ -180,6 +189,11 @@ const PAGE = `<!doctype html>
       // lid highlight
       x.fillStyle='rgba(245,232,214,0.18)'; soft('rgba(245,232,214,0.35)',0.04*f);
       blob(-0.248,-0.062,0.045,0.018); off();
+      // brow — a defined ridge above the eye
+      x.strokeStyle='rgba(40,26,17,0.62)'; x.lineWidth=0.026*f; x.lineCap='round';
+      soft('rgba(30,20,13,0.5)',0.02*f);
+      smoothOpen(L([[-0.31,-0.125],[-0.25,-0.135],[-0.185,-0.12]])); x.stroke();
+      off(); x.lineCap='butt';
 
       // nostril + under-nose
       x.fillStyle='rgba(18,12,8,0.55)'; soft('rgba(18,12,8,0.6)',0.03*f);
@@ -194,6 +208,11 @@ const PAGE = `<!doctype html>
       blob(-0.345,0.215,0.03,0.018); off();
       x.fillStyle='rgba(20,13,9,0.3)'; soft('rgba(20,13,9,0.45)',0.05*f);
       blob(-0.30,0.265,0.05,0.02); off();
+
+      // stubble — a very soft, faint shadow over the jaw and chin
+      x.fillStyle='rgba(28,20,15,0.06)'; soft('rgba(28,20,15,0.1)',0.11*f);
+      blob(-0.21,0.31,0.15,0.10);
+      off();
 
       // ear — a subtle curved fold, set back and mostly in shadow
       x.strokeStyle='rgba(18,12,8,0.4)'; x.lineWidth=0.014*f; x.lineCap='round';
@@ -217,6 +236,38 @@ const PAGE = `<!doctype html>
       smooth(pts);
       x.strokeStyle='rgba(245,248,255,0.10)'; x.lineWidth=0.006*f; x.stroke();
       x.restore();
+
+      // ---- hair: swept-up quiff with faded sides ----
+      var hp=HAIR.map(function(p){ return [p[0]*f, p[1]*f]; });
+      // shadow the hairline casts onto the forehead (clipped to skin)
+      x.save(); smooth(pts); x.clip();
+      x.strokeStyle='rgba(16,11,7,0.45)'; x.lineWidth=0.05*f; x.lineCap='round';
+      soft('rgba(16,11,7,0.45)',0.04*f);
+      smoothOpen(L([[-0.29,-0.30],[-0.16,-0.295],[-0.03,-0.26]])); x.stroke();
+      off(); x.lineCap='butt'; x.restore();
+      // hair mass
+      x.save(); smooth(hp); x.clip();
+      var hg=x.createLinearGradient(-0.34*f,0,0.36*f,0);
+      hg.addColorStop(0,'hsl(26 30% 31%)');
+      hg.addColorStop(0.4,'hsl(25 26% 18%)');
+      hg.addColorStop(0.72,'hsl(23 20% 9%)');
+      hg.addColorStop(1,'hsl(22 16% 4%)');
+      x.fillStyle=hg; x.fillRect(-0.6*f,-0.7*f,1.2*f,1.0*f);
+      // top sheen
+      var hs=x.createLinearGradient(0,-0.62*f,0,-0.30*f);
+      hs.addColorStop(0,'rgba(240,220,190,0.15)');
+      hs.addColorStop(1,'rgba(240,220,190,0)');
+      x.fillStyle=hs; x.fillRect(-0.6*f,-0.7*f,1.2*f,0.5*f);
+      // strand highlights sweeping up and back
+      x.strokeStyle='rgba(210,182,142,0.13)'; x.lineWidth=0.008*f; x.lineCap='round';
+      var sw=[-0.02,-0.055,-0.09,-0.125];
+      for(var si=0;si<sw.length;si++){ var o=sw[si];
+        smoothOpen(L([[-0.28,-0.40+o],[-0.12,-0.50+o],[0.08,-0.50+o],[0.24,-0.42+o]])); x.stroke();
+      }
+      x.lineCap='butt'; x.restore();
+      // crisp hair edge
+      x.save(); smooth(hp);
+      x.strokeStyle='rgba(18,12,8,0.45)'; x.lineWidth=0.006*f; x.stroke(); x.restore();
 
       x.restore();
     }
