@@ -33,225 +33,217 @@ const PAGE = `<!doctype html>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
-  body{background:#04050a;color:#eef1fb;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden;position:relative;cursor:crosshair;}
-  #sky{position:fixed;inset:0;z-index:1;}
-  .aurora{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;opacity:.5;}
-  .a1{width:66vw;height:66vw;left:-16vw;top:-24vh;background:radial-gradient(circle,hsl(230 70% 50% / 0.5),transparent 62%);animation:drift1 30s ease-in-out infinite;}
-  .a2{width:60vw;height:60vw;right:-18vw;bottom:-24vh;background:radial-gradient(circle,hsl(272 58% 50% / 0.4),transparent 62%);animation:drift2 36s ease-in-out infinite;}
-  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(5vw,4vh)}}
-  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-4vw,-5vh)}}
-  .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(120% 120% at 50% 48%,transparent 46%,rgba(0,0,0,0.72) 100%);}
-  .sig{position:fixed;top:6vh;left:0;right:0;z-index:3;text-align:center;font-weight:600;letter-spacing:0.42em;padding-left:0.42em;font-size:clamp(15px,2.4vw,20px);color:transparent;background:linear-gradient(180deg,#ffffff,#aeb9ff);-webkit-background-clip:text;background-clip:text;opacity:.82;}
-  .whisper{position:fixed;bottom:10vh;left:0;right:0;z-index:3;text-align:center;padding:0 24px;font-size:clamp(15px,2.5vw,22px);font-weight:400;line-height:1.5;color:rgba(226,231,251,0.82);min-height:1.6em;text-shadow:0 0 22px rgba(70,96,220,0.35);}
-  .caret{display:inline-block;width:0.5ch;margin-left:1px;color:rgba(150,170,255,0.9);animation:blink 1.05s step-end infinite;}
-  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-  @media (prefers-reduced-motion: reduce){.aurora{animation:none}.caret{animation:none}}
+  body{background:#0b0b0d;color:#e7e7ea;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden;position:relative;cursor:crosshair;}
+  #stage{position:fixed;inset:0;z-index:1;}
+  .grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+  .vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(120% 120% at 44% 42%,transparent 38%,rgba(0,0,0,0.84) 100%);}
+  .sig{position:fixed;top:6vh;left:0;right:0;z-index:4;text-align:center;font-weight:600;letter-spacing:0.46em;padding-left:0.46em;font-size:clamp(14px,2.2vw,19px);color:rgba(231,231,234,0.72);}
+  .hud{position:fixed;left:5vw;bottom:6vh;z-index:4;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;line-height:1.9;letter-spacing:0.18em;color:rgba(210,210,216,0.5);text-transform:uppercase;}
+  .hud .row{display:flex;gap:14px;}
+  .hud .k{width:78px;color:rgba(210,210,216,0.34);}
+  .hud .v{color:rgba(224,224,230,0.72);}
+  .hud .rule{width:150px;height:1px;background:rgba(210,210,216,0.16);margin:7px 0;}
+  @media (prefers-reduced-motion: reduce){.grain{display:none}}
 </style>
 </head>
 <body>
-  <div class="aurora a1"></div>
-  <div class="aurora a2"></div>
-  <canvas id="sky"></canvas>
+  <canvas id="stage"></canvas>
+  <div class="grain"></div>
   <div class="vignette"></div>
   <div class="sig">COEN</div>
-  <p class="whisper"><span id="say"></span><span class="caret">&#9601;</span></p>
+  <div class="hud">
+    <div>COEN.LIFE</div>
+    <div class="rule"></div>
+    <div class="row"><span class="k">State</span><span class="v" id="hState">Dormant</span></div>
+    <div class="row"><span class="k">Local</span><span class="v" id="hLocal">--:--</span></div>
+    <div class="row"><span class="k">Observed</span><span class="v" id="hObs">0s</span></div>
+    <div class="row"><span class="k">Status</span><span class="v">Offline &middot; Back shortly</span></div>
+  </div>
   <script>
   (function(){
-    var c=document.getElementById('sky'); if(!c) return;
+    var c=document.getElementById('stage'); if(!c) return;
     var x=c.getContext('2d'); if(!x) return;
-    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var dpr=Math.min(window.devicePixelRatio||1,2), W=0, H=0;
+    var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var dpr=Math.min(window.devicePixelRatio||1,2), W=0,H=0;
     function size(){ W=c.width=innerWidth*dpr; H=c.height=innerHeight*dpr; }
     size(); addEventListener('resize', size);
 
-    // ---- presence state ----
-    var start = Date.now();
-    var lastMove = -99999;        // ms timestamp of last real interaction
-    var interacted = false;
-    var px = 0.5, py = 0.5;       // pointer, normalised (0..1). starts centred.
-    var wake = 0;                 // 0 = asleep, 1 = fully awake (smoothed)
-    var blink = 0;                // 0..1 lid-close pulse
-    var nextBlink = 2200 + Math.random()*3000;
-    var blinkT = 0;
+    var start=Date.now(), lastMove=-99999, interacted=false;
+    var px=0.5, py=0.5, aimX=0, aimY=0, wake=0;
+    function pointer(cx,cy){ px=cx/innerWidth; py=cy/innerHeight; lastMove=performance.now(); interacted=true; }
+    addEventListener('mousemove',function(e){ pointer(e.clientX,e.clientY); });
+    addEventListener('touchmove',function(e){ if(e.touches[0]) pointer(e.touches[0].clientX,e.touches[0].clientY); },{passive:true});
 
-    function pointer(cx, cy){
-      px = cx/innerWidth; py = cy/innerHeight;
-      lastMove = performance.now();
-      if(!interacted){ interacted = true; onFirstWake(); }
-    }
-    addEventListener('mousemove', function(e){ pointer(e.clientX, e.clientY); });
-    addEventListener('touchstart', function(e){ if(e.touches[0]) pointer(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-    addEventListener('touchmove', function(e){ if(e.touches[0]) pointer(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-
-    // ---- star field (the void it sleeps in) ----
-    var stars=[];
-    for(var i=0;i<140;i++){ stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+0.3,tw:Math.random()*6.28}); }
-
-    // ---- the eye ----
-    function almond(cx, cy, ew, open){
-      var mh = ew*0.62*Math.max(0.06, open);
+    // smooth closed path through points (midpoint-quadratic)
+    function smooth(pts){
       x.beginPath();
-      x.moveTo(cx-ew, cy);
-      x.quadraticCurveTo(cx, cy-mh, cx+ew, cy);
-      x.quadraticCurveTo(cx, cy+mh, cx-ew, cy);
+      var n=pts.length;
+      var mx=(pts[n-1][0]+pts[0][0])/2, my=(pts[n-1][1]+pts[0][1])/2;
+      x.moveTo(mx,my);
+      for(var i=0;i<n;i++){
+        var cur=pts[i], nx=pts[(i+1)%n];
+        var midx=(cur[0]+nx[0])/2, midy=(cur[1]+nx[1])/2;
+        x.quadraticCurveTo(cur[0],cur[1],midx,midy);
+      }
       x.closePath();
-      return mh;
+    }
+    // smooth open curve through points
+    function smoothOpen(pts){
+      x.beginPath(); x.moveTo(pts[0][0],pts[0][1]);
+      for(var i=1;i<pts.length-1;i++){
+        var midx=(pts[i][0]+pts[i+1][0])/2, midy=(pts[i][1]+pts[i+1][1])/2;
+        x.quadraticCurveTo(pts[i][0],pts[i][1],midx,midy);
+      }
+      x.lineTo(pts[pts.length-1][0],pts[pts.length-1][1]);
     }
 
-    function drawEye(t, breath){
-      var cx=W*0.5, cy=H*0.485;
-      var ew=Math.min(W,H)*0.155;
-      // lid openness: asleep ~ a slit, awake ~ open, minus any blink.
-      var open = (0.09 + wake*0.9) * (1 - blink*0.94);
-      var mh = ew*0.62*Math.max(0.06, open);
+    // profile outline, facing left. fractions of head height, centre origin.
+    var OUT=[
+      [-0.02,-0.50],[-0.20,-0.47],[-0.30,-0.36],
+      [-0.335,-0.20],[-0.315,-0.135],[-0.335,-0.05],
+      [-0.45,0.055],[-0.35,0.10],[-0.335,0.115],
+      [-0.375,0.155],[-0.35,0.19],[-0.365,0.225],
+      [-0.30,0.255],[-0.315,0.315],[-0.255,0.375],
+      [-0.12,0.42],[0.02,0.425],[0.17,0.40],
+      [0.24,0.22],[0.325,0.02],[0.34,-0.18],[0.24,-0.40]
+    ];
 
-      // ambient presence bloom behind the eye — intensifies when awake.
-      var br = ew*(2.4 + 0.16*breath) * (0.7 + wake*0.7);
-      var bg = x.createRadialGradient(cx, cy, 0, cx, cy, br);
-      bg.addColorStop(0, 'hsla(226,90%,64%,'+(0.05+wake*0.16)+')');
-      bg.addColorStop(0.5, 'hsla(250,80%,56%,'+(0.02+wake*0.07)+')');
-      bg.addColorStop(1, 'hsla(250,80%,56%,0)');
-      x.fillStyle=bg; x.beginPath(); x.arc(cx,cy,br,0,6.283); x.fill();
+    function drawFace(t, breath){
+      var cx=W*0.46, cy=H*0.43;
+      var FH=Math.min(W*0.85, H*1.0)*0.60;
 
-      // gaze — iris leans toward the pointer.
-      var gx=(px-0.5), gy=(py-0.5);
-      var glen=Math.sqrt(gx*gx+gy*gy)||1;
-      var reach=ew*0.30*wake;
-      var ox=(gx/glen)*Math.min(glen*ew*2.2, reach);
-      var oy=(gy/glen)*Math.min(glen*ew*2.2, reach)*0.7;
+      // soft gallery pool behind
+      var pool=x.createRadialGradient(cx-FH*0.1, cy, 0, cx-FH*0.1, cy, FH*1.6);
+      pool.addColorStop(0,'rgba(120,122,134,0.14)');
+      pool.addColorStop(1,'rgba(120,122,134,0)');
+      x.fillStyle=pool; x.fillRect(0,0,W,H);
 
+      var rot=aimX*0.12;
       x.save();
-      almond(cx, cy, ew, open);
-      x.clip();
+      x.translate(cx, cy+FH*0.5+breath*FH*0.006);
+      x.rotate(rot);
+      x.translate(0, -FH*0.5);
+      var f=FH;
+      var pts=OUT.map(function(p){ return [p[0]*f, p[1]*f]; });
+      function L(a){ return a.map(function(p){ return [p[0]*f, p[1]*f]; }); }
+      function soft(cl,b){ x.shadowColor=cl; x.shadowBlur=b; }
+      function off(){ x.shadowBlur=0; x.shadowColor='transparent'; }
+      function blob(cxf,cyf,rx,ry){ x.save(); x.translate(cxf*f,cyf*f); x.scale(1,ry/rx); x.beginPath(); x.arc(0,0,rx*f,0,6.283); x.fill(); x.restore(); }
+      function rr(rx,ry,w,h,r){ x.beginPath(); x.moveTo(rx+r,ry); x.arcTo(rx+w,ry,rx+w,ry+h,r); x.arcTo(rx+w,ry+h,rx,ry+h,r); x.arcTo(rx,ry+h,rx,ry,r); x.arcTo(rx,ry,rx+w,ry,r); x.closePath(); }
 
-      // sclera: near-black with a faint inner glow so it reads in the void.
-      var sg=x.createRadialGradient(cx,cy,0,cx,cy,ew);
-      sg.addColorStop(0,'hsla(224,50%,10%,1)');
-      sg.addColorStop(1,'hsla(224,60%,4%,1)');
-      x.fillStyle=sg; x.fillRect(cx-ew,cy-mh,ew*2,mh*2);
+      // ---- mechanical armature behind ----
+      (function(){
+        var ny=0.44*f;
+        x.save();
+        var sg=x.createLinearGradient(-0.14*f,0,0.14*f,0);
+        sg.addColorStop(0,'#212226'); sg.addColorStop(0.45,'#63666e'); sg.addColorStop(0.55,'#888b93'); sg.addColorStop(0.7,'#4c4e54'); sg.addColorStop(1,'#191a1d');
+        x.fillStyle=sg; rr(-0.12*f, ny, 0.24*f, 0.15*f, 0.03*f); x.fill();
+        x.strokeStyle='#34363b'; x.lineWidth=0.02*f; x.lineCap='round';
+        x.beginPath(); x.moveTo(-0.07*f, ny+0.13*f); x.lineTo(-0.07*f, ny+0.42*f); x.stroke();
+        x.beginPath(); x.moveTo(0.07*f, ny+0.13*f); x.lineTo(0.07*f, ny+0.42*f); x.stroke();
+        x.restore();
+      })();
 
-      // iris
-      var ir=mh*1.15;
-      var icx=cx+ox, icy=cy+oy;
-      var ig=x.createRadialGradient(icx,icy,ir*0.18,icx,icy,ir);
-      ig.addColorStop(0,'hsla(224,85%,'+(30+wake*30)+'%,1)');
-      ig.addColorStop(0.6,'hsla(232,80%,'+(20+wake*20)+'%,1)');
-      ig.addColorStop(1,'hsla(236,70%,7%,1)');
-      x.fillStyle=ig; x.beginPath(); x.arc(icx,icy,ir,0,6.283); x.fill();
+      // ---- head fill, lit from the front-left ----
+      x.save();
+      smooth(pts); x.clip();
 
-      // iris striations for texture
-      x.strokeStyle='hsla(220,90%,80%,'+(0.05+wake*0.10)+')'; x.lineWidth=1*dpr;
-      for(var s=0;s<28;s++){ var a=s/28*6.283; x.beginPath();
-        x.moveTo(icx+Math.cos(a)*ir*0.34, icy+Math.sin(a)*ir*0.34);
-        x.lineTo(icx+Math.cos(a)*ir*0.95, icy+Math.sin(a)*ir*0.95); x.stroke(); }
+      var base=x.createLinearGradient(-0.45*f,0,0.36*f,0);
+      base.addColorStop(0,'hsl(30 20% 85%)');
+      base.addColorStop(0.28,'hsl(28 17% 66%)');
+      base.addColorStop(0.5,'hsl(26 15% 40%)');
+      base.addColorStop(0.72,'hsl(25 14% 18%)');
+      base.addColorStop(1,'hsl(24 12% 7%)');
+      x.fillStyle=base; x.fillRect(-0.6*f,-0.6*f,1.2*f,1.2*f);
 
-      // pupil — dilates as it wakes, contracts a touch when fully alert.
-      var pr=ir*(0.30+wake*0.16);
-      x.fillStyle='#01030a'; x.beginPath(); x.arc(icx,icy,pr,0,6.283); x.fill();
-      x.strokeStyle='hsla(228,90%,70%,'+(0.10+wake*0.28)+')'; x.lineWidth=1.4*dpr;
-      x.beginPath(); x.arc(icx,icy,pr,0,6.283); x.stroke();
+      // deepen the back of the skull into black (emerges from the dark)
+      var backsh=x.createLinearGradient(0.02*f,0,0.34*f,0);
+      backsh.addColorStop(0,'rgba(10,7,5,0)');
+      backsh.addColorStop(1,'rgba(6,4,3,0.72)');
+      x.fillStyle=backsh; x.fillRect(-0.6*f,-0.6*f,1.2*f,1.2*f);
 
-      // specular catch-light
-      x.fillStyle='hsla(210,100%,96%,'+(0.28+wake*0.5)+')';
-      x.beginPath(); x.arc(icx-ir*0.28, icy-ir*0.30, ir*0.11, 0, 6.283); x.fill();
+      // top light / under shadow
+      var tl=x.createLinearGradient(0,-0.5*f,0,0.5*f);
+      tl.addColorStop(0,'rgba(255,250,242,0.14)');
+      tl.addColorStop(0.5,'rgba(255,250,242,0)');
+      tl.addColorStop(1,'rgba(10,7,5,0.4)');
+      x.fillStyle=tl; x.fillRect(-0.6*f,-0.6*f,1.2*f,1.2*f);
 
+      // eye socket — a soft crescent of shadow above the closed lid
+      soft('rgba(20,13,9,0.7)',0.05*f);
+      x.fillStyle='rgba(26,17,12,0.32)';
+      blob(-0.245,-0.085,0.075,0.028); off();
+      // closed lash line
+      x.strokeStyle='rgba(22,14,10,0.7)'; x.lineWidth=0.011*f; x.lineCap='round';
+      smoothOpen(L([[-0.30,-0.05],[-0.245,-0.032],[-0.19,-0.045]])); x.stroke();
+      // lid highlight
+      x.fillStyle='rgba(245,232,214,0.18)'; soft('rgba(245,232,214,0.35)',0.04*f);
+      blob(-0.248,-0.062,0.045,0.018); off();
+
+      // nostril + under-nose
+      x.fillStyle='rgba(18,12,8,0.55)'; soft('rgba(18,12,8,0.6)',0.03*f);
+      blob(-0.335,0.10,0.028,0.018); off();
+      x.fillStyle='rgba(20,13,9,0.4)'; soft('rgba(20,13,9,0.5)',0.04*f);
+      blob(-0.32,0.125,0.05,0.02); off();
+
+      // mouth crease + lips
+      x.strokeStyle='rgba(20,13,10,0.6)'; x.lineWidth=0.010*f;
+      smoothOpen(L([[-0.375,0.192],[-0.335,0.20],[-0.29,0.205]])); x.stroke();
+      x.fillStyle='rgba(225,180,160,0.22)'; soft('rgba(225,180,160,0.35)',0.03*f);
+      blob(-0.345,0.215,0.03,0.018); off();
+      x.fillStyle='rgba(20,13,9,0.3)'; soft('rgba(20,13,9,0.45)',0.05*f);
+      blob(-0.30,0.265,0.05,0.02); off();
+
+      // ear — a subtle curved fold, set back and mostly in shadow
+      x.strokeStyle='rgba(18,12,8,0.4)'; x.lineWidth=0.014*f; x.lineCap='round';
+      soft('rgba(18,12,8,0.4)',0.03*f);
+      smoothOpen(L([[0.06,-0.05],[0.11,-0.02],[0.115,0.035],[0.085,0.075]])); x.stroke();
+      off(); x.lineCap='butt';
+
+      x.restore(); // unclip
+
+      // ---- front rim light (gallery key) ----
+      x.save();
+      smooth(pts); x.clip();
+      var rl=x.createLinearGradient(-0.46*f,0,-0.30*f,0);
+      rl.addColorStop(0,'rgba(232,238,250,0.55)');
+      rl.addColorStop(1,'rgba(232,238,250,0)');
+      x.fillStyle=rl; x.fillRect(-0.6*f,-0.6*f,0.32*f,1.2*f);
       x.restore();
 
-      // upper-lid rim light — a thin bright edge along the top of the opening.
+      // sculpted contour edge
       x.save();
-      x.strokeStyle='hsla(222,90%,82%,'+(0.10+wake*0.35)+')';
-      x.lineWidth=1.6*dpr; x.lineCap='round';
-      x.beginPath(); x.moveTo(cx-ew, cy); x.quadraticCurveTo(cx, cy-mh, cx+ew, cy); x.stroke();
+      smooth(pts);
+      x.strokeStyle='rgba(245,248,255,0.10)'; x.lineWidth=0.006*f; x.stroke();
+      x.restore();
+
       x.restore();
     }
 
     var last=0;
     function frame(t){
-      var dt = last? Math.min(t-last,60):16; last=t;
-
-      // wake target from idle time
-      var idle = performance.now()-lastMove;
-      var target = (interacted && idle<2600) ? 1 : 0;
-      var rate = target>wake ? 0.06 : 0.02;      // wakes fast, sleeps slow
-      wake += (target-wake)*Math.min(1, rate*dt/16);
-
-      // breathing: slow when asleep, quicker when awake
-      var brate = 0.0011 + wake*0.0013;
-      var breath = Math.sin(t*brate);
-
-      // blinks (only while at least partly awake)
-      if(!reduce && wake>0.3){
-        blinkT += dt;
-        if(blinkT>nextBlink){ blinkT=0; nextBlink=2600+Math.random()*4200; blink=1; }
-      }
-      blink += (0-blink)*Math.min(1,0.22*dt/16);
-
+      var dt=last?Math.min(t-last,60):16; last=t;
+      var idle=performance.now()-lastMove;
+      var target=(interacted&&idle<3200)?1:0;
+      wake += (target-wake)*Math.min(1,(target>wake?0.05:0.015)*dt/16);
+      aimX += ((px-0.5)*wake - aimX)*Math.min(1,0.04*dt/16);
+      aimY += ((py-0.5)*wake - aimY)*Math.min(1,0.04*dt/16);
+      var breath=Math.sin(t*(0.0011+wake*0.0007));
       x.clearRect(0,0,W,H);
-
-      // stars — drift a touch toward the pointer when awake (its attention).
-      for(var i=0;i<stars.length;i++){ var s=stars[i];
-        var twp = reduce?0.6:(0.4+0.6*Math.sin(t*0.002+s.tw));
-        var ax=s.x + (px-s.x)*0.04*wake, ay=s.y + (py-s.y)*0.04*wake;
-        x.beginPath(); x.arc(ax*W,ay*H,s.r*dpr,0,6.283);
-        x.fillStyle='hsla('+(210+s.x*40)+',70%,86%,'+(0.16+twp*0.5)+')'; x.fill();
-      }
-
-      drawEye(t, reduce?0:breath);
-
+      drawFace(t, reduce?0:breath);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
 
-    // ---- the voice: quiet, aware lines that type themselves ----
-    var sayEl=document.getElementById('say');
-    var token=0;
-    function type(str){
-      var my=++token; var i=0;
-      (function step(){ if(my!==token) return;
-        sayEl.textContent=str.slice(0,i); i++;
-        if(i<=str.length) setTimeout(step, 32+Math.random()*26);
-      })();
+    var hState=document.getElementById('hState'), hLocal=document.getElementById('hLocal'), hObs=document.getElementById('hObs');
+    function tick(){
+      var d=new Date();
+      hLocal.textContent=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+      hObs.textContent=Math.floor((Date.now()-start)/1000)+'s';
+      hState.textContent = wake>0.5 ? 'Aware' : (interacted?'Drowsing':'Dormant');
     }
-    function clock(){
-      var d=new Date(); var h=d.getHours(); var m=d.getMinutes();
-      var ap=h<12?'am':'pm'; var hh=h%12; if(hh===0) hh=12;
-      return hh+':'+(m<10?'0':'')+m+' '+ap;
-    }
-    function secs(){ return Math.floor((Date.now()-start)/1000); }
-    function timeMood(){
-      var h=new Date().getHours();
-      if(h<5) return 'the small hours. brave of you.';
-      if(h<12) return 'morning, then.';
-      if(h<18) return 'the afternoon light.';
-      if(h<22) return 'evening already.';
-      return 'it is late.';
-    }
-    var lines=[
-      function(){ return 'it is ' + clock() + ' where you are.'; },
-      function(){ return 'i can see you.'; },
-      function(){ return 'you have been watching for ' + secs() + 's.'; },
-      function(){ return timeMood(); },
-      function(){ return 'stay a while.'; },
-      function(){ return 'i know you are there.'; }
-    ];
-    var li=0, drowsing=false, wokeText=false;
-
-    function onFirstWake(){ /* handled by the tick once wake rises */ }
-
-    if(reduce){
-      type('something is sleeping here. it can feel that you arrived.');
-    } else {
-      type('something is sleeping here.');
-      setInterval(function(){
-        if(!interacted){ return; }
-        if(wake>0.55){
-          if(!wokeText){ wokeText=true; drowsing=false; type('you woke it.'); return; }
-          li=(li+1)%lines.length; type(lines[li]());
-        } else if(wake<0.25 && wokeText && !drowsing){
-          drowsing=true; wokeText=false; type('it is drifting back to sleep.');
-        }
-      }, 4600);
-    }
+    tick(); setInterval(tick, 500);
   })();
   </script>
 </body>
