@@ -17,9 +17,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * Locally it's off unless you set MAINTENANCE in .env.local.
  */
 
-// EMERGENCY TAKEDOWN — forced ON. To bring the site back: set this to false
-// (or delete these two lines) and push; that redeploys the live site.
-const FORCE_MAINTENANCE = true;
+// Maintenance override. Set to true (and push) to force the site into
+// maintenance mode again; false keeps the live site online. The MAINTENANCE
+// env var still works independently for a softer, env-driven takedown.
+const FORCE_MAINTENANCE = false;
 
 const ON = (v?: string) => v === "1" || v === "true" || v === "on";
 
