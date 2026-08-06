@@ -3,26 +3,21 @@ import { NextResponse, type NextRequest } from "next/server";
 /*
  * middleware.ts — maintenance mode.
  *
- * HOW TO USE (Vercel):
- *   • To take the site down: set env var  MAINTENANCE = 1  (Project → Settings →
- *     Environment Variables, Production) then redeploy. Every route then returns
- *     a friendly "back soon" page with HTTP 503 (the SEO-safe "temporarily
- *     unavailable" — Google will NOT deindex you for a short outage).
- *   • To bring it back: delete/blank the MAINTENANCE var and set FORCE_MAINTENANCE
- *     to false, then redeploy.
- *   • Optional owner bypass: set  MAINTENANCE_BYPASS = <some-secret>  then visit
- *     https://coen.life/?preview=<some-secret> once — a cookie is set so YOU keep
- *     seeing the live site while everyone else sees maintenance.
- *
- * Locally it's off unless you set MAINTENANCE in .env.local.
+ * HOW TO USE:
+ *   • To take the site down: set FORCE_MAINTENANCE = true below and push. Every
+ *     route then returns a maintenance page with HTTP 503 (the SEO-safe
+ *     "temporarily unavailable" — Google will NOT deindex you for a short outage).
+ *   • To bring it back: set FORCE_MAINTENANCE = false and push.
+ *   • Optional owner bypass while down: set env var  MAINTENANCE_BYPASS = <secret>
+ *     then visit https://coen.life/?preview=<secret> once — a cookie is set so YOU
+ *     keep seeing the live site while everyone else sees maintenance.
  */
 
-// Maintenance override. Set to true (and push) to force the site into
-// maintenance mode again; false keeps the live site online. The MAINTENANCE
-// env var still works independently for a softer, env-driven takedown.
+// Maintenance switch — the SINGLE source of truth. Set to true (and push) to
+// force the whole site into the maintenance page; false keeps it live. This is
+// intentionally the only control: no environment variable can override it, so
+// reactivating the site never depends on Vercel dashboard state.
 const FORCE_MAINTENANCE = false;
-
-const ON = (v?: string) => v === "1" || v === "true" || v === "on";
 
 const PAGE = `<!doctype html>
 <html lang="en">
@@ -290,7 +285,7 @@ const PAGE = `<!doctype html>
 </html>`;
 
 export function middleware(req: NextRequest) {
-  if (!FORCE_MAINTENANCE && !ON(process.env.MAINTENANCE)) return NextResponse.next();
+  if (!FORCE_MAINTENANCE) return NextResponse.next();
 
   // Owner bypass: ?preview=<secret> sets a cookie; a matching cookie lets you through.
   const secret = process.env.MAINTENANCE_BYPASS;
