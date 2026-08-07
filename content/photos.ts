@@ -13,4 +13,6 @@ export const photos: Photo[] = [
   { src: "/photos5.jpeg", alt: "Photograph by Coen", width: 1169, height: 728 },
   { src: "/photos6.jpeg", alt: "Photograph by Coen", width: 3024, height: 4032 },
   { src: "/photos7.png", alt: "Photograph by Coen", width: 738, height: 1246 },
+  { src: "/ADED5912-1267-46CA-A6F4-984A40FE01A9_1_201_a.jpeg", alt: "Photograph by Coen", width: 620, height: 724 },
+  { src: "/8BC8E50A-BF03-4323-9F91-ECE9CD2306B4_1_105_c.jpeg", alt: "Photograph by Coen", width: 768, height: 1024 },
 ];

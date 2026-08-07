@@ -28,6 +28,7 @@ export const projects: Project[] = [
     gallery: [
       { src: "/project1-2.jpg", alt: "Digital safety work with Snapchat and eSafety Australia", width: 7833, height: 5222 },
       { src: "/project1-3.jpeg", alt: "Digital safety work with Snapchat and eSafety Australia", width: 1170, height: 631 },
+      { src: "/6063D486-C08F-45B4-8F10-20FE9CE81A73_1_201_a.jpeg", alt: "Digital safety work with Snapchat and eSafety Australia", width: 1022, height: 1255 },
     ],
   },
   {
