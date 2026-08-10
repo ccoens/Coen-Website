@@ -8,16 +8,60 @@ import { NextResponse, type NextRequest } from "next/server";
  *     route then returns a maintenance page with HTTP 503 (the SEO-safe
  *     "temporarily unavailable" — Google will NOT deindex you for a short outage).
  *   • To bring it back: set FORCE_MAINTENANCE = false and push.
+ *   • "Permanently banned" gag screen: set FORCE_BAN = true and push. Every route
+ *     returns the ban page with HTTP 403. Set it back to false to lift it. NOTE:
+ *     403 is not SEO-safe — leave it on only briefly or Google may deindex you.
  *   • Optional owner bypass while down: set env var  MAINTENANCE_BYPASS = <secret>
  *     then visit https://coen.life/?preview=<secret> once — a cookie is set so YOU
  *     keep seeing the live site while everyone else sees maintenance.
  */
+
+// Ban switch — when true, every route serves the "permanently banned" page
+// (HTTP 403). Takes priority over maintenance. Set to false to lift it.
+const FORCE_BAN = true;
 
 // Maintenance switch — the SINGLE source of truth. Set to true (and push) to
 // force the whole site into the maintenance page; false keeps it live. This is
 // intentionally the only control: no environment variable can override it, so
 // reactivating the site never depends on Vercel dashboard state.
 const FORCE_MAINTENANCE = false;
+
+const BAN_PAGE = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Access denied</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{background:#08080a;color:#f4f4f6;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;overflow:hidden;position:relative;}
+  .glow{position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 55% at 50% 42%,rgba(220,42,42,0.22),transparent 62%);animation:breathe 4.5s ease-in-out infinite;}
+  .scan{position:fixed;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:overlay;background:repeating-linear-gradient(180deg,rgba(255,255,255,0.035) 0 1px,transparent 1px 3px);}
+  .wrap{position:relative;max-width:62rem;z-index:2;}
+  .tag{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;letter-spacing:0.42em;text-transform:uppercase;color:rgba(255,92,92,0.92);margin-bottom:26px;display:inline-flex;align-items:center;gap:10px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 16px #ff3b3b;animation:pulse 1.6s ease-in-out infinite;}
+  h1{font-size:clamp(30px,7.4vw,88px);font-weight:700;letter-spacing:-0.03em;line-height:1.05;}
+  h1 .red{color:#ff4646;text-shadow:0 0 44px rgba(255,60,60,0.55);}
+  p{margin-top:24px;color:rgba(244,244,246,0.5);font-size:clamp(14px,2vw,18px);line-height:1.6;}
+  .foot{position:fixed;bottom:6vh;left:0;right:0;z-index:2;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(244,244,246,0.32);}
+  @keyframes pulse{0%,100%{opacity:.5;transform:scale(.8)}50%{opacity:1;transform:scale(1.3)}}
+  @keyframes breathe{0%,100%{opacity:.72}50%{opacity:1}}
+  @media (prefers-reduced-motion: reduce){.glow,.dot{animation:none}}
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="scan"></div>
+  <div class="wrap">
+    <div class="tag"><span class="dot"></span> Access denied &middot; 403</div>
+    <h1>You've been <span class="red">permanently banned</span> from my website.</h1>
+    <p>This decision is final. There is no appeal.</p>
+  </div>
+  <div class="foot">COEN.LIFE &nbsp;//&nbsp; Connection terminated</div>
+</body>
+</html>`;
+
 
 const PAGE = `<!doctype html>
 <html lang="en">
@@ -285,6 +329,16 @@ const PAGE = `<!doctype html>
 </html>`;
 
 export function middleware(req: NextRequest) {
+  if (FORCE_BAN) {
+    return new NextResponse(BAN_PAGE, {
+      status: 403,
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
+  }
+
   if (!FORCE_MAINTENANCE) return NextResponse.next();
 
   // Owner bypass: ?preview=<secret> sets a cookie; a matching cookie lets you through.
