@@ -18,7 +18,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Ban switch — when true, every route serves the "permanently banned" page
 // (HTTP 403). Takes priority over maintenance. Set to false to lift it.
-const FORCE_BAN = true;
+const FORCE_BAN = false;
 
 // Maintenance switch — the SINGLE source of truth. Set to true (and push) to
 // force the whole site into the maintenance page; false keeps it live. This is
