@@ -31,6 +31,7 @@ import { ExitIntent } from "./ExitIntent";
 import { Dream } from "./Dream";
 import { StarSketch } from "./StarSketch";
 import { SkyTimelapse } from "./SkyTimelapse";
+import { ScreenshotGuard } from "./ScreenshotGuard";
 import { PageTransition } from "./PageTransition";
 import { ContactProvider } from "./Contact";
 
@@ -102,6 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Dream />
             <StarSketch />
             <SkyTimelapse />
+            <ScreenshotGuard />
           </ContactProvider>
         </SmoothScroll>
       </LazyMotion>
