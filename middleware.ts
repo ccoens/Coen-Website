@@ -24,7 +24,7 @@ const FORCE_BAN = false;
 // force the whole site into the maintenance page; false keeps it live. This is
 // intentionally the only control: no environment variable can override it, so
 // reactivating the site never depends on Vercel dashboard state.
-const FORCE_MAINTENANCE = false;
+const FORCE_MAINTENANCE = true;
 
 const BAN_PAGE = `<!doctype html>
 <html lang="en">
